@@ -8,24 +8,52 @@
 
 
     <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="26dp"
+        android:layout_marginRight="26dp"
+        android:layout_marginBottom="13dp"
+        android:text="time"
+        app:layout_constraintBottom_toTopOf="@+id/location"
+        app:layout_constraintEnd_toEndOf="@+id/location" />
+
+    <TextView
         android:id="@+id/location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="340dp"
-        android:text="TextView"
+        android:text="location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/location_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="Button"
+        android:layout_marginStart="76dp"
+        android:layout_marginLeft="76dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="location"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.304"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/location" />
+
+    <Button
+        android:id="@+id/time_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="22dp"
+        android:layout_marginRight="22dp"
+        android:text="Time"
+        app:layout_constraintBaseline_toBaselineOf="@+id/location_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/location_button" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

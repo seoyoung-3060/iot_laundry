@@ -21,10 +21,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+
+    //현재시간&날짜 가져오기
+    long mNow;
+    Date mDate;
+    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+    TextView dateTextView;
+    Button timeButton;
 
     private GPSTracker gpsTracker;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -35,6 +45,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dateTextView = (TextView)findViewById(R.id.time);
+        timeButton = (Button)findViewById(R.id.time_button);
+
+
         if (!checkLocationServicesStatus()) {
 
             showDialogForLocationServiceSetting();
@@ -44,25 +59,56 @@ public class MainActivity extends AppCompatActivity {
 
         final TextView textview_address = (TextView)findViewById(R.id.location);
 
-        Button ShowLocationButton = (Button) findViewById(R.id.button);
+        Button ShowLocationButton = (Button) findViewById(R.id.location_button);
 
         ShowLocationButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View arg0)
+            public void onClick(View v)
             {
+                switch (v.getId()){
+                    case R.id.location_button:
+                        gpsTracker = new GPSTracker(MainActivity.this);
 
-                gpsTracker = new GPSTracker(MainActivity.this);
+                        double latitude = gpsTracker.getLatitude();
+                        double longitude = gpsTracker.getLongitude();
 
-                double latitude = gpsTracker.getLatitude();
-                double longitude = gpsTracker.getLongitude();
+                        String address = getCurrentAddress(latitude, longitude);
+                        textview_address.setText(address);
 
-                String address = getCurrentAddress(latitude, longitude);
-                textview_address.setText(address);
-
-                Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
+                        break;
+                    default:
+                        break;
+                }
             }
         });
+
+        Button timeButton = (Button) findViewById(R.id.time_button);
+        timeButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                switch (v.getId()) {
+                    case R.id.time_button:
+                        dateTextView.setText(getTime());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+
+
+    }
+
+
+
+    private String getTime(){
+        mNow = System.currentTimeMillis();
+        mDate = new Date(mNow);
+        return mFormat.format(mDate);
     }
 
 
