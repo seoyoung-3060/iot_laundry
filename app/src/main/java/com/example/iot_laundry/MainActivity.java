@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-
     //현재시간&날짜 가져오기
     long mNow;
     Date mDate;
