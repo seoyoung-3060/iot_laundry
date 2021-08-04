@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
                         String localName = local[3];//동이름 불러옴
 
                         readExcel(localName);
+                        Toast.makeText(MainActivity.this, localName, Toast.LENGTH_LONG).show();
 
 //                        String weather = "";
 //                        WeatherData weatherData = new WeatherData();
