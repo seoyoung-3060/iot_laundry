@@ -20,25 +20,38 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
+
 public class MainActivity extends AppCompatActivity {
     //현재시간&날짜 가져오기
     long mNow;
     Date mDate;
-    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm"); //dateFormat바꿈
+    //date와 time String으로 가져오기
+    SimpleDateFormat timeFormat = new SimpleDateFormat("hh00");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
     TextView dateTextView;
-    Button timeButton;
 
     private GPSTracker gpsTracker;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+
+    //excel x,y
+    private String x="", y="", address = "";
+    private String date = "", time = "", total_date="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +59,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         dateTextView = (TextView)findViewById(R.id.time);
-        timeButton = (Button)findViewById(R.id.time_button);
-
 
         if (!checkLocationServicesStatus()) {
 
@@ -58,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
         final TextView textview_address = (TextView)findViewById(R.id.location);
 
-        Button ShowLocationButton = (Button) findViewById(R.id.location_button);
+        Button ShowLocationButton = (Button) findViewById(R.id.reset_button);
 
         ShowLocationButton.setOnClickListener(new View.OnClickListener()
         {
@@ -66,16 +77,40 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v)
             {
                 switch (v.getId()){
-                    case R.id.location_button:
+                    case R.id.reset_button:
                         gpsTracker = new GPSTracker(MainActivity.this);
+
+                        mNow = System.currentTimeMillis();
+                        mDate = new Date(mNow);
+
+                        time = timeFormat.format(mDate);
+                        date = dateFormat.format(mDate);
+                        total_date = mFormat.format(mDate);
+                        dateTextView.setText(total_date);
 
                         double latitude = gpsTracker.getLatitude();
                         double longitude = gpsTracker.getLongitude();
 
-                        String address = getCurrentAddress(latitude, longitude);
+                        address = getCurrentAddress(latitude, longitude);
+                        String[] local = address.split(" "); //local[0]==대한민국 local[1]==부산광역시 local[2]==금정구 local[3]==장전동
+                        String localName = local[3];//동이름 불러옴
+
+                        readExcel(localName);
+
+//                        String weather = "";
+//                        WeatherData weatherData = new WeatherData();
+//                        try {
+//                            weather = weatherData.lookUpWeather(date, time, x, y);
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                        Log.i("현재날씨",weather);
+
                         textview_address.setText(address);
 
-                        Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
                         break;
                     default:
                         break;
@@ -83,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        /* time_button->reload_button으로 합침
         Button timeButton = (Button) findViewById(R.id.time_button);
         timeButton.setOnClickListener(new View.OnClickListener()
         {
@@ -98,10 +134,42 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+         */
 
 
     }
 
+    private void readExcel(String localName) {
+        try {
+            InputStream inputStream = getBaseContext().getResources().getAssets().open("local_name.xls");
+            Workbook workbook = Workbook.getWorkbook(inputStream);
+
+            if (workbook != null) {
+                Sheet sheet = workbook.getSheet(0);
+                if(sheet != null) {
+                    int colTotal = sheet.getColumns();
+                    int rowIndexStart = 1;
+                    int rowTotal = sheet.getColumn(colTotal - 1).length;
+
+                    for (int row = rowIndexStart; row < rowTotal; row++) {
+                        String contents = sheet.getCell(0, row).getContents();
+                        if (contents.contains(localName)) {
+                            x = sheet.getCell(2, row).getContents();
+                            y = sheet.getCell(3, row).getContents();
+                            row = rowTotal;
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            Log.i("READ_EXCEL1", e.getMessage());
+            e.printStackTrace();
+        } catch (BiffException e) {
+            Log.i("READ_EXCEL1", e.getMessage());
+            e.printStackTrace();
+        }
+        Log.i("격자값", "x="+x+" y="+y);
+    }
 
 
     private String getTime(){
