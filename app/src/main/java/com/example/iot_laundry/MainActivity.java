@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
                         time = timeFormat.format(Date);
                         date = dateFormat.format(Date);
+                        
                         Log.i("total_date",total_date);
                         Log.i("time",time);
                         Log.i("date",date);
