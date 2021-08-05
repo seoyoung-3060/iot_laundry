@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
                         address = getCurrentAddress(latitude, longitude);
                         Log.i("address",address);
-                        
+
                         String[] local = address.split(" "); //local[0]==대한민국 local[1]==부산광역시 local[2]==금정구 local[3]==장전동
                         String localName = local[2];//'구'이름 불러옴
 
@@ -109,8 +109,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, localName, Toast.LENGTH_LONG).show();
 
                         Log.i("localname",localName);
-
-
+                        
                         String weather = "";
                         WeatherData weatherData = new WeatherData();
                         try {
