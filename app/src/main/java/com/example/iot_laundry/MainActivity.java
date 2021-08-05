@@ -37,10 +37,12 @@ public class MainActivity extends AppCompatActivity {
     //현재시간&날짜 가져오기
     long mNow;
     Date mDate;
-    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm"); //dateFormat바꿈
+    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss"); //dateFormat바꿈
+    /* 이부분 오류남
     //date와 time String으로 가져오기
     SimpleDateFormat timeFormat = new SimpleDateFormat("hh00");
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+     */
 
     TextView dateTextView;
 
@@ -83,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
                         mNow = System.currentTimeMillis();
                         mDate = new Date(mNow);
 
-                        time = timeFormat.format(mDate);
-                        date = dateFormat.format(mDate);
+//                        time = timeFormat.format(mDate);
+//                        date = dateFormat.format(mDate);
                         total_date = mFormat.format(mDate);
                         dateTextView.setText(total_date);
 
@@ -98,16 +100,16 @@ public class MainActivity extends AppCompatActivity {
                         readExcel(localName);
                         Toast.makeText(MainActivity.this, localName, Toast.LENGTH_LONG).show();
 
-//                        String weather = "";
-//                        WeatherData weatherData = new WeatherData();
-//                        try {
-//                            weather = weatherData.lookUpWeather(date, time, x, y);
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                        Log.i("현재날씨",weather);
+                        String weather = "";
+                        WeatherData weatherData = new WeatherData();
+                        try {
+                            weather = weatherData.lookUpWeather(date, time, x, y);
+                        } catch (JSONException e) {
+                            Log.i("WEATHER_JSONERROR", e.getMessage());
+                        } catch (IOException e) {
+                            Log.i("WEATHER_IOERROR",e.getMessage());
+                        }
+                        Log.i("현재날씨",weather);
 
                         textview_address.setText(address);
 
