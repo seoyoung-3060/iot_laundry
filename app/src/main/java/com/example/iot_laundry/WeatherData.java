@@ -32,6 +32,7 @@ public class WeatherData {
         urlBuilder.append("&" + URLEncoder.encode("dataType", "UTF-8") + "=" + URLEncoder.encode(type, "UTF-8"));    /* 타입 */
 
         URL url = new URL(urlBuilder.toString());
+        Log.i("url주소", String.valueOf(url));
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");

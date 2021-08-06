@@ -35,12 +35,13 @@ import jxl.read.biff.BiffException;
 
 public class MainActivity extends AppCompatActivity {
     //현재시간&날짜 가져오기
-    long mNow;
-    Date mDate;
-    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm"); //dateFormat바꿈
+    long now;
+    Date Date;
+    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss"); //dateFormat바꿈
     //date와 time String으로 가져오기
-    SimpleDateFormat timeFormat = new SimpleDateFormat("hh00");
+    SimpleDateFormat timeFormat = new SimpleDateFormat("HHmm");
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+
 
     TextView dateTextView;
 
@@ -79,33 +80,45 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.reset_button:
                         gpsTracker = new GPSTracker(MainActivity.this);
 
-                        mNow = System.currentTimeMillis();
-                        mDate = new Date(mNow);
+                        now = System.currentTimeMillis();
+                        Date = new Date(now);
 
-                        time = timeFormat.format(mDate);
-                        date = dateFormat.format(mDate);
-                        total_date = mFormat.format(mDate);
+                        //이부분에서 오류나는것으로 확인됨
+
+                        total_date = mFormat.format(Date);
                         dateTextView.setText(total_date);
+
+                        time = timeFormat.format(Date);
+                        date = dateFormat.format(Date);
+
+                        Log.i("total_date",total_date);
+                        Log.i("time",time);
+                        Log.i("date",date);
 
                         double latitude = gpsTracker.getLatitude();
                         double longitude = gpsTracker.getLongitude();
 
                         address = getCurrentAddress(latitude, longitude);
+                        Log.i("address",address);
+
                         String[] local = address.split(" "); //local[0]==대한민국 local[1]==부산광역시 local[2]==금정구 local[3]==장전동
-                        String localName = local[3];//동이름 불러옴
+                        String localName = local[2];//'구'이름 불러옴
 
                         readExcel(localName);
+                        Toast.makeText(MainActivity.this, localName, Toast.LENGTH_LONG).show();
 
-//                        String weather = "";
-//                        WeatherData weatherData = new WeatherData();
-//                        try {
-//                            weather = weatherData.lookUpWeather(date, time, x, y);
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                        Log.i("현재날씨",weather);
+                        Log.i("localname",localName);
+                        
+                        String weather = "";
+                        WeatherData weatherData = new WeatherData();
+                        try {
+                            weather = weatherData.lookUpWeather(date, time, x, y);
+                        } catch (JSONException e) {
+                            Log.i("WEATHER_JSONERROR", e.getMessage());
+                        } catch (IOException e) {
+                            Log.i("WEATHER_IOERROR",e.getMessage());
+                        }
+                        Log.i("현재날씨",weather);
 
                         textview_address.setText(address);
 
@@ -117,30 +130,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /* time_button->reload_button으로 합침
-        Button timeButton = (Button) findViewById(R.id.time_button);
-        timeButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                switch (v.getId()) {
-                    case R.id.time_button:
-                        dateTextView.setText(getTime());
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-         */
-
 
     }
 
     private void readExcel(String localName) {
         try {
-            InputStream inputStream = getBaseContext().getResources().getAssets().open("local_name.xls");
+            InputStream inputStream = getBaseContext().getResources().getAssets().open("local_name.xlsx");
             Workbook workbook = Workbook.getWorkbook(inputStream);
 
             if (workbook != null) {
@@ -172,9 +167,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private String getTime(){
-        mNow = System.currentTimeMillis();
-        mDate = new Date(mNow);
-        return mFormat.format(mDate);
+        now = System.currentTimeMillis();
+        Date = new Date(now);
+        return mFormat.format(Date);
     }
 
 
