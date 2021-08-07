@@ -7,6 +7,10 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,10 +28,12 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import jxl.Sheet;
 import jxl.Workbook;
@@ -42,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     SimpleDateFormat timeFormat = new SimpleDateFormat("HHmm");
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
-
     TextView dateTextView;
 
     private GPSTracker gpsTracker;
@@ -53,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     //excel x,y
     private String x="", y="", address = "";
     private String date = "", time = "", total_date="";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
