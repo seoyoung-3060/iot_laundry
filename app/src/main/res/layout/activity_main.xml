@@ -68,7 +68,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="6"
-        android:progress="3"
+        android:progress="1"
         style="?android:attr/progressBarStyleHorizontal"/>
 
     <View style="@style/divider_style"
