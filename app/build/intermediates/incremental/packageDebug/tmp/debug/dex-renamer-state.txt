@@ -1,0 +1,4 @@
+#Sun Aug 08 17:32:23 KST 2021
+base.0=D\:\\coding\\prj_4weeks\\iot_laundry\\app\\build\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
