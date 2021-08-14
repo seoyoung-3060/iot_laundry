@@ -8,21 +8,30 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
 public class WeatherData {
     private String weather = "", rain = "", reh = "";
+    private String TAG = "WeatherDatalog";
 
     public String lookUpWeather(String baseDate, String time, String nx, String ny) throws IOException, JSONException {
 //        String baseDate = date;
         String baseTime = timeChange(time);
         String type = "json";
 
-        String apiURL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0";
-        String serviceKey = "QK0I%2Bb1xeGcqkwrmsq%2FnDohNQgrpwIviKakibnwqQBCK%2BrvVRYuG9%2Blkv1LTrWZEp3OdIvLiiEehxErd1t%2BGGQ%3D%3D";
+        //seoyoung
+//        String apiURL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0";
+//        String serviceKey = "QK0I%2Bb1xeGcqkwrmsq%2FnDohNQgrpwIviKakibnwqQBCK%2BrvVRYuG9%2Blkv1LTrWZEp3OdIvLiiEehxErd1t%2BGGQ%3D%3D";
+
+        //sumin
+        String apiURL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
+        String serviceKey = "cU7%2F%2FBtN5Kb66G%2BYYW61iwedrB0vlroCHcTP5v60uNO2jHJRnu%2BwCDqz3ZKllb%2Buzgw1XJLa99yxDNMzuNxEkw%3D%3D";
+
         StringBuilder urlBuilder = new StringBuilder(apiURL);
         urlBuilder.append("?" + URLEncoder.encode("ServiceKey", "UTF-8") + "=" + serviceKey);
         urlBuilder.append("&" + URLEncoder.encode("nx", "UTF-8") + "=" + URLEncoder.encode(nx, "UTF-8")); //경도
@@ -31,27 +40,115 @@ public class WeatherData {
         urlBuilder.append("&" + URLEncoder.encode("base_time", "UTF-8") + "=" + URLEncoder.encode(baseTime, "UTF-8")); /* 조회하고싶은 시간 AM 02시부터 3시간 단위 */
         urlBuilder.append("&" + URLEncoder.encode("dataType", "UTF-8") + "=" + URLEncoder.encode(type, "UTF-8"));    /* 타입 */
 
-        URL url = new URL(urlBuilder.toString());
-        Log.i("url주소", String.valueOf(url));
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("Content-type", "application/json");
+        final String[] result = new String[1];
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(urlBuilder.toString());
+                    Log.i("1url주소", String.valueOf(url));
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty("Content-type", "application/json");
+                    Log.d(TAG, "1메서드호출전");
 
-        //해석..
-        BufferedReader rd;
-        if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
-            rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        } else {
-            rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
-        }
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = rd.readLine()) != null) {
-            sb.append(line);
-        }
-        rd.close();
-        conn.disconnect();
-        String result = sb.toString();
+                    Log.d(TAG, "포핰"+ String.valueOf(conn.getResponseCode()));
+                    InputStream stream = conn.getInputStream();
+                    InputStreamReader reader = new InputStreamReader(stream);
+                    BufferedReader bufferedReader = new BufferedReader(reader);
+                    String li;
+                    StringBuilder sb2 = new StringBuilder();
+                    while ((li = bufferedReader.readLine()) != null) {
+                        Log.d(TAG, "결과:"+ li);
+                        result[0] = li;
+                        sb2.append(li);
+                        Log.d(TAG, "결과1:"+ sb2.toString());
+
+                    }
+                    Log.d(TAG, "결과2:"+ sb2.toString());
+
+                    bufferedReader.close();
+
+
+//                    //added
+                    BufferedReader rd;
+//                    Log.d(TAG, String.valueOf(conn.getResponseCode()));
+//                    if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) { //여기서오류
+//                        rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+//                    } else {
+//                        rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+//                    }
+//                    StringBuilder sb = new StringBuilder();
+//                    String line2;
+//                    while ((line2 = rd.readLine()) != null) {
+//                        sb.append(line2);
+//                    }
+//                    rd.close();
+//                    conn.disconnect();
+//                    String result = sb.toString();
+//                    Log.d(TAG, "결과2: "+result);
+//                    //end of add
+
+                    if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) { //여기서오류
+                        rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    } else {
+                        rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                    }
+                    Log.d(TAG, "zz"+ String.valueOf(rd));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = rd.readLine()) != null) {
+                        sb.append(line);
+                        Log.d(TAG, "캬하"+sb.toString());
+                    }
+                    rd.close();
+                    conn.disconnect();
+                    String result = sb.toString();
+
+                    Log.d(TAG, "결과3:"+ result);
+
+
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+//
+//        URL url = new URL(urlBuilder.toString());
+//        Log.i("url주소", String.valueOf(url));
+//        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//        conn.setRequestMethod("GET");
+//        conn.setRequestProperty("Content-type", "application/json");
+//        Log.d(TAG, "메서드호출전");
+//        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) { //에러
+//            Log.d(TAG, "Server returned HTTP "  + conn.getResponseMessage());
+//        }
+
+//        Log.d(TAG, "Response code: " + conn.getResponseCode());
+//
+//
+//
+//        //해석..
+//        BufferedReader rd;
+//        Log.d(TAG, String.valueOf(conn.getResponseCode()));
+////        if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) { //여기서오류
+////            rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+////        } else {
+////            rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+////        }
+////        StringBuilder sb = new StringBuilder();
+////        String line;
+////        while ((line = rd.readLine()) != null) {
+////            sb.append(line);
+////        }
+////        rd.close();
+////        conn.disconnect();
+//        String result = sb.toString();
+        String result = sb2.toString();
+//
 
         //respose 키로 데이터파싱
         JSONObject OBJ1 = new JSONObject(result);
@@ -67,7 +164,7 @@ public class WeatherData {
         Log.i("ITEMS", items);
 
         //items로 itemlist받기
-        JSONObject OBJ4 = new JSONObject(result);
+        JSONObject OBJ4 = new JSONObject(result[0]);
         JSONArray jsonArray = OBJ4.getJSONArray("itemlist");
 
         for(int i=0; i<jsonArray.length(); i++) {

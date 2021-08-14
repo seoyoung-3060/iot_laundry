@@ -41,7 +41,7 @@ import jxl.read.biff.BiffException;
 
 public class MainActivity extends AppCompatActivity {
     //현재시간&날짜 가져오기
-    long now;
+    long now; //ll
     Date Date;
     SimpleDateFormat mFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss"); //dateFormat바꿈
     //date와 time String으로 가져오기
@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
     //excel x,y
     private String x="", y="", address = "";
     private String date = "", time = "", total_date="";
+
+    private String TAG = "MainActivitylog";
 
 
     @Override
@@ -118,7 +120,8 @@ public class MainActivity extends AppCompatActivity {
                         String weather = "";
                         WeatherData weatherData = new WeatherData();
                         try {
-                            weather = weatherData.lookUpWeather(date, time, x, y);
+//                            weather = weatherData.lookUpWeather(date, time, x, y);
+                            weather = weatherData.lookUpWeather("20210815", "0200", "60", "125");
                         } catch (JSONException e) {
                             Log.i("WEATHER_JSONERROR", e.getMessage());
                         } catch (IOException e) {
@@ -141,10 +144,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void readExcel(String localName) {
         try {
-            InputStream inputStream = getBaseContext().getResources().getAssets().open("local_name.xlsx");
-            Workbook workbook = Workbook.getWorkbook(inputStream);
-
+            Log.d(TAG, "readExcel1");
+//            InputStream inputStream = getBaseContext().getResources().getAssets().open("local_name.xlsx");
+            InputStream inputStream = getBaseContext().getResources().getAssets().open("local_name.xls");
+            Log.d(TAG, "readExcel2");
+            Workbook workbook = Workbook.getWorkbook(inputStream); //여기 오류나는듯
+            Log.d(TAG, "readExcel3");
             if (workbook != null) {
+                Log.d(TAG, String.valueOf(workbook));
                 Sheet sheet = workbook.getSheet(0);
                 if(sheet != null) {
                     int colTotal = sheet.getColumns();
@@ -160,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
-            }
+            } else Log.d(TAG, "우ㅓ크북 널");
         } catch (IOException e) {
             Log.i("READ_EXCEL1", e.getMessage());
             e.printStackTrace();
