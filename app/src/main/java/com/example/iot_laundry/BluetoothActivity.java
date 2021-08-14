@@ -36,7 +36,7 @@ public class BluetoothActivity extends AppCompatActivity {
     public byte[] sendByte = new byte[4];
     public TextView tvBT;
     public ProgressDialog asyncDialog;
-    private static final int REQUEST_ENABLE_BT = 1;
+    private static final int REQUEST_ENABLE_BT = 3;
 
     private Button BTButton, btnSend;
 
