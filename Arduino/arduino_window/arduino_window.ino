@@ -1,11 +1,14 @@
-#include <SoftwareSerial.h>
+#include <ESP8266Firebase.h>
+#include <ESP8266WiFi.h>
 #include <Stepper.h>
-#define IN1 8
-#define IN2 9
-#define IN3 10
-#define IN4 11
-const int stepsPerRevolution = 200; // 모터의 1회전당 스텝 수에 맞게 조정
-Stepper myStepper(stepsPerRevolution, 11,9,10,8);
+
+#define FIREBASE_HOST ""
+#define FIREBASE_AUTH ""
+#define WIFI_SSID ""
+#define WIFI_PASSWORD ""
+
+const int stepsPerRevolution = 200; // 360도회전 신호
+Stepper myStepper(stepsPerRevolution, 8,9,10,11);
 boolean window_state = false; //false==닫힌상태
 boolean rain = false;
 boolean humidity = false; //습도 데이터받음 기준치보다 높은지낮은지만 간단하게!
@@ -13,28 +16,25 @@ boolean humidity = false; //습도 데이터받음 기준치보다 높은지낮�
 String ssid=""; //wifi ID
 String PASSWORD="";
 String host = ""; //computer IP
-SoftwareSerial mySerial(2,3);
 
-void connectWifi() {
-  String cmd = "AT+CWMODE=1";
-  mySerial.println(cmd);
-  cmd="AT+CWJAP=\""+ssid+"\",\""+PASSWORD+"\"";
-  mySerial.println(cmd);
-  delay(2000);
-  if(mySerial.find("OK")) {
-    Serial.println("Wifi Connected!");
-  } else {
-    Serial.println("Connect Timeout"+ms);
-  }
-}
 
 void setup() {
   myStepper.setSpeed(60);
   Serial.begin(9600);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting");
+  while(WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(500);
+  }
+  Serial.print("Connected: ");
+  Serial.println(WiFi.localIP());
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+
 }
 
 void anticlockwise() {
-  for(int i=0; i<12; i++) {
+  for(int i=0; i<2; i++) {
     myStepper.step(stepsPerRevolution);
     Serial.println(i);
   }
@@ -46,5 +46,16 @@ void clockwise() {
   }
 }
 void loop() {
-  if(
+  float humidity = Firebase.getFloat("Humidity");
+  boolean rain_state = Firebase.getBool("Rain");
+  delay(500);
+  Serial.println("Humidity= "+humidity);
+
+  if(humidity > 123 || !(rain_state)) {
+    clockwise();
+    delay(500);
+  } else {
+    anticlockwise();
+    delay(500);
+  }
 }
