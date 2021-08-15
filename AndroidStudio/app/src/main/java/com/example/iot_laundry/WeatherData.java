@@ -147,57 +147,57 @@ public class WeatherData {
 ////        rd.close();
 ////        conn.disconnect();
 //        String result = sb.toString();
-        String result = sb2.toString();
+//        String result = sb2.toString();
+////
 //
-
-        //respose 키로 데이터파싱
-        JSONObject OBJ1 = new JSONObject(result);
-        String response = OBJ1.getString("response");
-
-        //response로 body찾기
-        JSONObject OBJ2 = new JSONObject(response);
-        String body = OBJ2.getString("body");
-
-        //body로 items찾기
-        JSONObject OBJ3 = new JSONObject(body);
-        String items = OBJ3.getString("items");
-        Log.i("ITEMS", items);
-
-        //items로 itemlist받기
-        JSONObject OBJ4 = new JSONObject(result[0]);
-        JSONArray jsonArray = OBJ4.getJSONArray("itemlist");
-
-        for(int i=0; i<jsonArray.length(); i++) {
-            OBJ4 = jsonArray.getJSONObject(i);
-            String fcstValue = OBJ4.getString("fcstValue");
-            String category = OBJ4.getString("category");
-
-            if (category.equals("SKY")) {
-                weather = "현재 날씨 : ";
-                if (fcstValue.equals("1")) {
-                    weather += "맑음";
-                } else if (fcstValue.equals("2")) {
-                    weather += "비";
-                } else if (fcstValue.equals("3")) {
-                    weather += "구름많음";
-                } else if (fcstValue.equals("4")) {
-                    weather += "흐림";
-                }
-            }
-
-            if (category.equals("POP")) {
-                rain = "강수확률 : " + fcstValue + "%";
-            }
-
-            if (category.equals("REH")) {
-                reh = "습도 : " + fcstValue + "%";
-            }
-
-            Log.i("날씨", fcstValue);
-            Log.i("카테고리", category);
-            Log.i("현재날씨", weather+rain+reh);
-        }
-
+//        //respose 키로 데이터파싱
+//        JSONObject OBJ1 = new JSONObject(result);
+//        String response = OBJ1.getString("response");
+//
+//        //response로 body찾기
+//        JSONObject OBJ2 = new JSONObject(response);
+//        String body = OBJ2.getString("body");
+//
+//        //body로 items찾기
+//        JSONObject OBJ3 = new JSONObject(body);
+//        String items = OBJ3.getString("items");
+//        Log.i("ITEMS", items);
+//
+//        //items로 itemlist받기
+//        JSONObject OBJ4 = new JSONObject(result[0]);
+//        JSONArray jsonArray = OBJ4.getJSONArray("itemlist");
+//
+//        for(int i=0; i<jsonArray.length(); i++) {
+//            OBJ4 = jsonArray.getJSONObject(i);
+//            String fcstValue = OBJ4.getString("fcstValue");
+//            String category = OBJ4.getString("category");
+//
+//            if (category.equals("SKY")) {
+//                weather = "현재 날씨 : ";
+//                if (fcstValue.equals("1")) {
+//                    weather += "맑음";
+//                } else if (fcstValue.equals("2")) {
+//                    weather += "비";
+//                } else if (fcstValue.equals("3")) {
+//                    weather += "구름많음";
+//                } else if (fcstValue.equals("4")) {
+//                    weather += "흐림";
+//                }
+//            }
+//
+//            if (category.equals("POP")) {
+//                rain = "강수확률 : " + fcstValue + "%";
+//            }
+//
+//            if (category.equals("REH")) {
+//                reh = "습도 : " + fcstValue + "%";
+//            }
+//
+//            Log.i("날씨", fcstValue);
+//            Log.i("카테고리", category);
+//            Log.i("현재날씨", weather+rain+reh);
+//        }
+//
         return weather + rain + reh;
 
     }
