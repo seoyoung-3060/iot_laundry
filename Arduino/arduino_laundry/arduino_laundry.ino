@@ -1,83 +1,70 @@
-#include <SoftwareSerial.h> //wifi
+#include <ESP8266WiFiGratuitous.h>
+#include <WiFiServerSecure.h>
+#include <WiFiClientSecure.h>
+#include <ArduinoWiFiServer.h>
+#include <WiFiClientSecureBearSSL.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266WiFiMulti.h>
+#include <WiFiUdp.h>
+#include <ESP8266WiFiType.h>
+#include <CertStoreBearSSL.h>
+#include <ESP8266WiFiAP.h>
+#include <WiFiClient.h>
+#include <BearSSLHelpers.h>
+#include <WiFiServer.h>
+#include <ESP8266WiFiScan.h>
+#include <WiFiServerSecureBearSSL.h>
+#include <ESP8266WiFiGeneric.h>
+#include <ESP8266WiFiSTA.h>
+
+#include <ESP8266Firebase.h>
+
 #include <DHT.h>
 #include <DHT_U.h>
 
+#define FIREBASE_HOST ""
+#define FIREBASE_AUTH ""
+#define WIFI_SSID ""
+#define WIFI_PASSWORD ""
+
 #define DHTPIN
 #define DHTTYPE
-String ssid=""; //wifi ID
-String PASSWORD="";
-String host = ""; //computer IP
-
 
 DHT dht(DHTPIN, DHTTYPE);
-SoftwareSerial ms(2,3);//TX,RX
-
-void connectWifi() {
-  String cmd = "AT+CWMODE=1";
-  ms.println(cmd);
-  cmd="AT+CWJAP=\""+ssid+"\",\""+PASSWORD+"\"";
-  ms.println(cmd);
-  delay(2000);
-  if(ms.find("OK")) {
-    Serial.println("Wifi Connected!");
-  } else {
-    Serial.println("Connect Timeout"+ms);
-  }
-}
-
-void httpclient(String input) {
-  String connect_server_cmd = "AI+CIPSTART=,\"TCP\",""+host+"\",8787";
-  delay(500);
-  ms.println(connect_server_cmd);
-  String url = input;
-  String httpCmd = "GET /process.php?temp="+url+"HTTP/1.0\r\n\r\n";
-  String cmd = "AT+CIPSEND=,"+httpCmd.length();
-  ms.println(cmd);
-  ms.println(httpCmd);
-  if(ms.find(">")){
-    Serial.print(">");
-  } else{
-    ms.println("AT+CIPCLOSE");
-    Serial.pritnln("Connect Timeout");
-    delay(1000);
-    return;
-  }
-  delay(500);
-
-  ms.println(cmd);
-  Serial.println(cmd);
-  delay(100);
-  if(Serial.find("ERROR")) return;
-  mySerial.println("AT+CIPCLOSE");
-  delay(100);
-}
 
 void setup() {
   Serial.begin(9600);
   dht.begin();
-  ms.begin(9600);
-  connectWifi();
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting");
+  while(WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(500);
+  }
+  Serial.print("Connected: ");
+  Serial.println(WiFi.localIP());
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
 }
 
 void loop() {
   delay(2000);
   float humidity = dht.readHumidity();
-  float temperature = dht.readTemperature();
 
   //값읽기 오류확인
-  if (isnan(humidity) || isnan(temperature)) {
+  if (isnan(humidity)) {
     Serial.println("Failed to read");
     return;
   }
   //Serial에서 값확인하려고 출력
   Serial.print(humidity);
-  Serial.print(temperature);
-
-  String output = String(temperature)+"&humidity="+String(humidity);
-  httpclient(output);
-  delay(1000);
-
-  if(ms.available()) {
-    Serial.write(ms.read());
+  
+  Firebase.setFloat("Humidity", humidity);
+  delay(500);
+  //handle error
+  if (Firebase.failed()) {
+    Serial.print("Setting number failed: ");
+    Serial.println(Firebase.error());
+    return;
   }
+
 }
