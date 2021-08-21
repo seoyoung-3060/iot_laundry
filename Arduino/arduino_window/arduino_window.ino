@@ -45,12 +45,8 @@ void clockwise() {
     Serial.println(i);
   }
 }
-void loop() {
-  float humidity = Firebase.getFloat("Humidity");
-  boolean rain_state = Firebase.getBool("Rain");
-  delay(500);
-  Serial.println("Humidity= "+humidity);
 
+void window(humidity) {
   if(humidity > 123 || !(rain_state)) {
     clockwise();
     delay(500);
@@ -58,4 +54,20 @@ void loop() {
     anticlockwise();
     delay(500);
   }
+}
+
+void curtain(humidity) {
+  
+}
+
+void loop() {
+  float humidity = Firebase.getFloat("Humidity");
+  boolean rain_state = Firebase.getBool("Rain");
+  delay(500);
+  Serial.println("Humidity= "+humidity);
+
+  window(humidity);
+  curtain(humidity);
+  delay(1000);
+  
 }
