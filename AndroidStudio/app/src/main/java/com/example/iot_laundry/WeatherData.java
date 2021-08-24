@@ -24,6 +24,12 @@ public class WeatherData {
         String baseTime = timeChange(time);
         String type = "json";
 
+        Log.i(TAG,"time: " + time);
+        Log.i(TAG,"baseDate: " + baseDate);
+        Log.i(TAG,"baseTime: " + baseTime);
+        Log.i(TAG,"nx: " + nx);
+        Log.i(TAG,"ny: " + ny);
+
         //seoyoung
 //        String apiURL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0";
 //        String serviceKey = "QK0I%2Bb1xeGcqkwrmsq%2FnDohNQgrpwIviKakibnwqQBCK%2BrvVRYuG9%2Blkv1LTrWZEp3OdIvLiiEehxErd1t%2BGGQ%3D%3D";
@@ -59,58 +65,91 @@ public class WeatherData {
                     String li;
                     StringBuilder sb2 = new StringBuilder();
                     while ((li = bufferedReader.readLine()) != null) {
-                        Log.d(TAG, "결과:"+ li);
-                        result[0] = li;
                         sb2.append(li);
-                        Log.d(TAG, "결과1:"+ sb2.toString());
-
                     }
                     Log.d(TAG, "결과2:"+ sb2.toString());
 
                     bufferedReader.close();
-
-
-//                    //added
-                    BufferedReader rd;
-//                    Log.d(TAG, String.valueOf(conn.getResponseCode()));
+//                    //start; original
+//                    BufferedReader rd;
 //                    if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) { //여기서오류
+//                        Log.d(TAG, "zz성공");
 //                        rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 //                    } else {
+//                        Log.d(TAG, "zz실패");
 //                        rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
 //                    }
+//                    Log.d(TAG, "zz3성공");
+//
+//                    Log.d(TAG, "zz"+ String.valueOf(rd));
 //                    StringBuilder sb = new StringBuilder();
-//                    String line2;
-//                    while ((line2 = rd.readLine()) != null) {
-//                        sb.append(line2);
+//                    String line;
+//                    while ((line = rd.readLine()) != null) {
+//                        sb.append(line);
+//                        Log.d(TAG, "캬하"+sb.toString());
 //                    }
 //                    rd.close();
 //                    conn.disconnect();
 //                    String result = sb.toString();
-//                    Log.d(TAG, "결과2: "+result);
-//                    //end of add
+//                    Log.d(TAG, "결과3:"+ result);
+//                    //end; original
 
-                    if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) { //여기서오류
-                        rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                    } else {
-                        rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
-                    }
-                    Log.d(TAG, "zz"+ String.valueOf(rd));
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-                    while ((line = rd.readLine()) != null) {
-                        sb.append(line);
-                        Log.d(TAG, "캬하"+sb.toString());
-                    }
-                    rd.close();
-                    conn.disconnect();
-                    String result = sb.toString();
+                    String result = sb2.toString();
+                    // response 키를 가지고 데이터를 파싱
+                    JSONObject jsonObj_1 = new JSONObject(result);
+                    String response = jsonObj_1.getString("response");
 
-                    Log.d(TAG, "결과3:"+ result);
+                    // response 로 부터 body 찾기
+                    JSONObject jsonObj_2 = new JSONObject(response);
+                    String body = jsonObj_2.getString("body");
+
+                    // body 로 부터 items 찾기
+                    JSONObject jsonObj_3 = new JSONObject(body);
+                    String items = jsonObj_3.getString("items");
+                    Log.i("ITEMS", items);
+
+                    // items로 부터 itemlist 를 받기
+                    JSONObject jsonObj_4 = new JSONObject(items);
+                    JSONArray jsonArray = jsonObj_4.getJSONArray("item");
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        jsonObj_4 = jsonArray.getJSONObject(i);
+                        String fcstValue = jsonObj_4.getString("fcstValue");
+                        String category = jsonObj_4.getString("category");
+
+                        if (category.equals("SKY")) {
+                            weather = "현재 날씨는 ";
+                            if (fcstValue.equals("1")) {
+                                weather += "맑은 상태로";
+                            } else if (fcstValue.equals("2")) {
+                                weather += "비가 오는 상태로 ";
+                            } else if (fcstValue.equals("3")) {
+                                weather += "구름이 많은 상태로 ";
+                            } else if (fcstValue.equals("4")) {
+                                weather += "흐린 상태로 ";
+                            }
+                        }
+
+                        if (category.equals("POP")) {
+                            rain = "강수확률 : " + fcstValue + "%";
+                        }
+
+                        if (category.equals("REH")) {
+                            reh = "습도 : " + fcstValue + "%";
+                        }
+
+                        Log.i("날씨", fcstValue);
+                        Log.i("카테고리", category);
+                        Log.i("현재날씨", weather+rain+reh);
+                    }
+
 
 
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
