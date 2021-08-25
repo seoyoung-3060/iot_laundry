@@ -30,11 +30,6 @@ public class WeatherData {
         Log.i(TAG,"nx: " + nx);
         Log.i(TAG,"ny: " + ny);
 
-        //seoyoung
-//        String apiURL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0";
-//        String serviceKey = "QK0I%2Bb1xeGcqkwrmsq%2FnDohNQgrpwIviKakibnwqQBCK%2BrvVRYuG9%2Blkv1LTrWZEp3OdIvLiiEehxErd1t%2BGGQ%3D%3D";
-
-        //sumin
         String apiURL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
         String serviceKey = "cU7%2F%2FBtN5Kb66G%2BYYW61iwedrB0vlroCHcTP5v60uNO2jHJRnu%2BwCDqz3ZKllb%2Buzgw1XJLa99yxDNMzuNxEkw%3D%3D";
 
@@ -52,49 +47,31 @@ public class WeatherData {
             public void run() {
                 try {
                     URL url = new URL(urlBuilder.toString());
-                    Log.i("1url주소", String.valueOf(url));
+                    Log.i("url주소", String.valueOf(url));
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty("Content-type", "application/json");
-                    Log.d(TAG, "1메서드호출전");
 
-                    Log.d(TAG, "포핰"+ String.valueOf(conn.getResponseCode()));
-                    InputStream stream = conn.getInputStream();
-                    InputStreamReader reader = new InputStreamReader(stream);
-                    BufferedReader bufferedReader = new BufferedReader(reader);
-                    String li;
-                    StringBuilder sb2 = new StringBuilder();
-                    while ((li = bufferedReader.readLine()) != null) {
-                        sb2.append(li);
+                    Log.d(TAG, String.valueOf(conn.getResponseCode()));
+                    BufferedReader bufferedReader;// = new BufferedReader(reader);
+                    if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
+                        bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    } else {
+                        bufferedReader = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
                     }
-                    Log.d(TAG, "결과2:"+ sb2.toString());
+
+                    String line;
+                    StringBuilder sb = new StringBuilder();
+                    while ((line = bufferedReader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    Log.d(TAG, "결과2:"+ sb.toString());
 
                     bufferedReader.close();
-//                    //start; original
-//                    BufferedReader rd;
-//                    if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) { //여기서오류
-//                        Log.d(TAG, "zz성공");
-//                        rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-//                    } else {
-//                        Log.d(TAG, "zz실패");
-//                        rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
-//                    }
-//                    Log.d(TAG, "zz3성공");
-//
-//                    Log.d(TAG, "zz"+ String.valueOf(rd));
-//                    StringBuilder sb = new StringBuilder();
-//                    String line;
-//                    while ((line = rd.readLine()) != null) {
-//                        sb.append(line);
-//                        Log.d(TAG, "캬하"+sb.toString());
-//                    }
-//                    rd.close();
-//                    conn.disconnect();
-//                    String result = sb.toString();
-//                    Log.d(TAG, "결과3:"+ result);
-//                    //end; original
+                    conn.disconnect();
 
-                    String result = sb2.toString();
+                    String result = sb.toString();
+
                     // response 키를 가지고 데이터를 파싱
                     JSONObject jsonObj_1 = new JSONObject(result);
                     String response = jsonObj_1.getString("response");
@@ -143,8 +120,6 @@ public class WeatherData {
                         Log.i("현재날씨", weather+rain+reh);
                     }
 
-
-
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -154,91 +129,7 @@ public class WeatherData {
                 }
             }
         }).start();
-
-//
-//        URL url = new URL(urlBuilder.toString());
-//        Log.i("url주소", String.valueOf(url));
-//        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//        conn.setRequestMethod("GET");
-//        conn.setRequestProperty("Content-type", "application/json");
-//        Log.d(TAG, "메서드호출전");
-//        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) { //에러
-//            Log.d(TAG, "Server returned HTTP "  + conn.getResponseMessage());
-//        }
-
-//        Log.d(TAG, "Response code: " + conn.getResponseCode());
-//
-//
-//
-//        //해석..
-//        BufferedReader rd;
-//        Log.d(TAG, String.valueOf(conn.getResponseCode()));
-////        if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) { //여기서오류
-////            rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-////        } else {
-////            rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
-////        }
-////        StringBuilder sb = new StringBuilder();
-////        String line;
-////        while ((line = rd.readLine()) != null) {
-////            sb.append(line);
-////        }
-////        rd.close();
-////        conn.disconnect();
-//        String result = sb.toString();
-//        String result = sb2.toString();
-////
-//
-//        //respose 키로 데이터파싱
-//        JSONObject OBJ1 = new JSONObject(result);
-//        String response = OBJ1.getString("response");
-//
-//        //response로 body찾기
-//        JSONObject OBJ2 = new JSONObject(response);
-//        String body = OBJ2.getString("body");
-//
-//        //body로 items찾기
-//        JSONObject OBJ3 = new JSONObject(body);
-//        String items = OBJ3.getString("items");
-//        Log.i("ITEMS", items);
-//
-//        //items로 itemlist받기
-//        JSONObject OBJ4 = new JSONObject(result[0]);
-//        JSONArray jsonArray = OBJ4.getJSONArray("itemlist");
-//
-//        for(int i=0; i<jsonArray.length(); i++) {
-//            OBJ4 = jsonArray.getJSONObject(i);
-//            String fcstValue = OBJ4.getString("fcstValue");
-//            String category = OBJ4.getString("category");
-//
-//            if (category.equals("SKY")) {
-//                weather = "현재 날씨 : ";
-//                if (fcstValue.equals("1")) {
-//                    weather += "맑음";
-//                } else if (fcstValue.equals("2")) {
-//                    weather += "비";
-//                } else if (fcstValue.equals("3")) {
-//                    weather += "구름많음";
-//                } else if (fcstValue.equals("4")) {
-//                    weather += "흐림";
-//                }
-//            }
-//
-//            if (category.equals("POP")) {
-//                rain = "강수확률 : " + fcstValue + "%";
-//            }
-//
-//            if (category.equals("REH")) {
-//                reh = "습도 : " + fcstValue + "%";
-//            }
-//
-//            Log.i("날씨", fcstValue);
-//            Log.i("카테고리", category);
-//            Log.i("현재날씨", weather+rain+reh);
-//        }
-//
         return weather + rain + reh;
-
     }
 
     private String timeChange(String time) {

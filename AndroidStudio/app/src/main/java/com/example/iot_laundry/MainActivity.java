@@ -75,9 +75,9 @@ public class MainActivity extends AppCompatActivity {
         buttonShowLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 현재 시간, 날짜 얻어오기
-                now = System.currentTimeMillis();
-                Date = new Date(now);
+                // 현재 시간 및 날짜 얻어오기
+                now = System.currentTimeMillis(); //현재 시간 가져오기
+                Date = new Date(now);             //Date 생성하기
 
                 total_date = mFormat.format(Date);
                 dateTextView.setText(total_date);
@@ -131,18 +131,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void readExcel(String localName) {
         try {
-            Log.d(TAG, "readExcel1");
-//            InputStream inputStream = getBaseContext().getResources().getAssets().open("local_name.xlsx");
             InputStream inputStream = getBaseContext().getResources().getAssets().open("local_name.xls");
-            Log.d(TAG, "readExcel2");
             Workbook workbook = Workbook.getWorkbook(inputStream); //여기 오류나는듯
-            Log.d(TAG, "readExcel3");
+
             if (workbook != null) {
-                Log.d(TAG, String.valueOf(workbook));
-                Sheet sheet = workbook.getSheet(0);
+                Sheet sheet = workbook.getSheet(0); // 시트 불러오기
                 if(sheet != null) {
-                    int colTotal = sheet.getColumns();
-                    int rowIndexStart = 1;
+                    int colTotal = sheet.getColumns(); //전체 칼럼
+                    int rowIndexStart = 1;             //row 인덱스 시작
                     int rowTotal = sheet.getColumn(colTotal - 1).length;
 
                     for (int row = rowIndexStart; row < rowTotal; row++) {
@@ -154,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
-            } else Log.d(TAG, "우ㅓ크북 널");
+            }
         } catch (IOException e) {
             Log.i("READ_EXCEL1", e.getMessage());
             e.printStackTrace();
@@ -162,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("READ_EXCEL1", e.getMessage());
             e.printStackTrace();
         }
-        Log.i("격자값", "x="+x+" y="+y);
+        Log.i("격자값", "x = " + x + "  y = " + y);
     }
 
 
