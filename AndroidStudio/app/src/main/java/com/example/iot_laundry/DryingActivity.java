@@ -3,22 +3,39 @@ package com.example.iot_laundry;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
+
+import com.example.iot_laundry.firebase.MyFirebase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 
@@ -53,13 +70,73 @@ public class DryingActivity extends AppCompatActivity {
     private String x="", y="", address = "";
     private String date = "", time = "", total_date="";
 
-    private String TAG = "MainActivitylog";
+    private String TAG = "DryingActivityLog";
 
+    ToggleButton toggleAC, toggleCurtain, toggleWindow;
+//    ToggleButton[] toggleButtonList = {toggleAC, toggleCurtain, toggleWindow};
+
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        createNotificationChannel();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drying);
+
+        //init view
+        progressBar = findViewById(R.id.progressBar);
+
+        //toggle button
+        toggleAC = findViewById(R.id.toggleAC);
+        toggleCurtain = findViewById(R.id.toggleCurtain);
+        toggleWindow = findViewById(R.id.toggleWindow);
+
+
+        toggleAC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = toggleAC.isChecked();
+                MyFirebase.acRef.setValue(isChecked);
+            }
+        });
+        toggleCurtain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = toggleCurtain.isChecked();
+                MyFirebase.curtRet.setValue(isChecked);
+            }
+        });
+        toggleWindow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = toggleWindow.isChecked();
+                MyFirebase.winRet.setValue(isChecked);
+            }
+        });
+
+        MyFirebase.moistRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String moistStr = String.valueOf((Long) dataSnapshot.getValue());
+                Log.d(TAG, "moistRef");
+                int moist =  Integer.parseInt(moistStr);
+//                tem.setText(tem2);
+                progressBar.setProgress(60-moist);
+                if (moist < 5) {
+//                    builder.show();
+                    sendNotification();
+                    Log.d(TAG, "건조완료, moist: " + moist);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+
+
 
         dateTextView = (TextView)findViewById(R.id.textViewTime);
 
@@ -109,8 +186,6 @@ public class DryingActivity extends AppCompatActivity {
                 WeatherData weatherData = new WeatherData();
                 try {
                     weather = weatherData.lookUpWeather(date, time, x, y);
-//                            weather = weatherData.lookUpWeather("20210825", "0200", "60", "125");
-//                            weather = weatherData.lookUpWeather("20210825", "2300", "57", "128");
                     Log.d(TAG, weather);
                 } catch (JSONException e) {
                     Log.i("WEATHER_JSONERROR", e.getMessage());
@@ -308,8 +383,57 @@ public class DryingActivity extends AppCompatActivity {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
+    private void createNotificationChannel() {
+        String channelId = "one-channel";
+        String channelName = "My Channel One1";
+        String channelDescription = "My Channel One Description";
+
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+            channel.setDescription(channelDescription);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+    private void sendNotification() {
+        Intent intent = new Intent(this, LaundryCompleteActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        intent.putExtra("AnotherActivity", TrueOrFalse);
+//        intent.putExtra("imageUri", imageUri);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+
+//        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.laundrydrying)
+//                .setSmallIcon(IconCompat.createWithBitmap(image))
+//                .setLargeIcon(image) //not work
+//                .setContentTitle(messageBody)
+                .setContentTitle("건조가 완료되었습니다")
+                .setContentText("건조완료")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                .setStyle(new NotificationCompat.BigPictureStyle()
+//                        .bigPicture(image))/*Notification with Image*/
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+    }
 
 }
+
+
 /** END OF CODE **/
 //switch (v.getId()){
 //        case R.id.reset_button:

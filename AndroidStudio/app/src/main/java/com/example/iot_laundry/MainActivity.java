@@ -14,11 +14,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button = findViewById(R.id.buttonStart);
-        button.setOnClickListener(new View.OnClickListener() {
+        Button buttonStart = findViewById(R.id.buttonStart);
+        buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), DryingActivity.class);
+                //시작 시의 수분센서값 넘겨주어야 함
 
                 startActivity(intent);
 
