@@ -50,6 +50,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
 //    노티피케이션
-    implementation "com.android.support:support-compat:28.0.0"
+//    implementation "com.android.support:support-compat:28.0.0"
 
 }
