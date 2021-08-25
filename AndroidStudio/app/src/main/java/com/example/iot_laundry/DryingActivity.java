@@ -13,12 +13,15 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import org.json.JSONException;
 
@@ -32,6 +35,9 @@ import java.util.Locale;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class DryingActivity extends AppCompatActivity {
     //현재시간&날짜 가져오기
@@ -43,6 +49,12 @@ public class DryingActivity extends AppCompatActivity {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
     TextView dateTextView;
+    TextView weatherTextView;
+    TextView adviceTextView;
+
+    ToggleButton ac_button;
+    ToggleButton curtain_button;
+    ToggleButton window_button;
 
     private GPSTracker gpsTracker;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -62,6 +74,12 @@ public class DryingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_drying);
 
         dateTextView = (TextView)findViewById(R.id.textViewTime);
+        weatherTextView = (TextView)findViewById(R.id.textViewWeather);
+        adviceTextView = (TextView)findViewById(R.id.textViewAdvice);
+
+        ac_button = (ToggleButton)findViewById(R.id.ac_btn);
+        curtain_button = (ToggleButton)findViewById(R.id.curtain_btn);
+        window_button = (ToggleButton)findViewById(R.id.window_btn);
 
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
@@ -108,7 +126,7 @@ public class DryingActivity extends AppCompatActivity {
                 String weather = "";
                 WeatherData weatherData = new WeatherData();
                 try {
-                    weather = weatherData.lookUpWeather(date, time, x, y);
+                    weather = weatherData.lookUpWeather(date, time, x, y, weatherTextView, adviceTextView);
 //                            weather = weatherData.lookUpWeather("20210825", "0200", "60", "125");
 //                            weather = weatherData.lookUpWeather("20210825", "2300", "57", "128");
                     Log.d(TAG, weather);
@@ -124,6 +142,54 @@ public class DryingActivity extends AppCompatActivity {
 //                        Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
             }
 
+        });
+
+        String serverAdress = "";
+
+        ac_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                String ac_status;
+                if (isChecked){
+                    ac_status = "acOn";
+                    Log.i("ac","acon");
+                } else {
+                    ac_status = "acOff";
+                    Log.i("ac","acoff");
+                }
+                HttpRequestTask requestTask = new HttpRequestTask(serverAdress);
+                requestTask.execute(ac_status);
+            }
+        });
+        curtain_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                String curtain_status;
+                if (isChecked){
+                    curtain_status = "cOn";
+
+                } else {
+                    curtain_status = "cOff";
+                }
+                HttpRequestTask requestTask = new HttpRequestTask(serverAdress);
+                requestTask.execute(curtain_status);
+            }
+        });
+        window_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                String window_status;
+                if (isChecked){
+                    window_status = "winOn";
+
+                } else {
+                    window_status = "winOff";
+
+                }
+                HttpRequestTask requestTask = new HttpRequestTask(serverAdress);
+                requestTask.execute(window_status);
+            }
         });
 
 
@@ -309,7 +375,42 @@ public class DryingActivity extends AppCompatActivity {
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
+    public static class HttpRequestTask extends AsyncTask<String, Void, String> {
+        private String serverAdress;
+        public HttpRequestTask(String serverAdress) {
+            this.serverAdress = serverAdress;
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            String val = params[0];
+            final String url = "http://"+serverAdress + "/" + val;
+
+            //okHttp 라이브러리를 사용한다.
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            try {
+                Response response = client.newCall(request).execute();
+                //Log.d(TAG, response.body().string());
+                return null;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+
+
+    }
 }
 /** END OF CODE **/
-//switch (v.getId()){
-//        case R.id.reset_button:

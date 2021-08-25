@@ -17,7 +17,9 @@
 #define FIREBASE_AUTH "qlNCOwAypMDI1bjWPus5Szvs32lTDu1EDkRqEqiy"
 
 #define WIFI_SSID "SK_WiFiGIGA2B95"  
-#define WIFI_PASSWORD "1603064717"  
+#define WIFI_PASSWORD "1603064717"
+
+WiFiServer server(80); //추가
 
 int MOISTPIN = A0;
 
@@ -33,7 +35,15 @@ void setup() {
   }  
   Serial.println();  
   Serial.print("connected: ");  
-  Serial.println(WiFi.localIP());  
+  Serial.println(WiFi.localIP());
+
+  //server
+  server.begin();
+  Serial.println("Server started");
+  Serial.print("URL to connect: ");
+  Serial.print("http://");
+  Serial.print(WiFi.localIP());
+  Serial.print("/");
     
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);  
 }  
@@ -42,12 +52,19 @@ int n = 0;
   
 void loop() {  
   /** 클라이언트(앱) 처리. 연결 안됐으면 return; **/
-  if (Serial.read()!= '1') {             // 임시로 시리얼 모니터에 1이 입력된게 클라이언트와 연결된걸로 가정
+  WiFiClient client = server.available();
+  if(!client) {
     return;
   }
   Serial.println("앱으로부터 연결 완료, 건조 시스템 시작");
+  while(!client.available()){
+    delay(1);
+  }
+  String request = client.readStringUntil('\r');
+  Serial.println(request);
+  client.flush();
 
-  while (true) {
+  if(request.indexOf("/start")>0) {
     /** 클라이언트(앱) 과 연결 됐다면, **/
     // soil sensor
     delay(2000);  //2초 단위, 테스트용

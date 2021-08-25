@@ -27,8 +27,6 @@
         </activity>
         <activity android:name=".DryingActivity">
         </activity>
-        <activity android:name=".trash.BluetoothActivity02" />
-        <activity android:name=".trash.BluetoothActivity" />
         <activity android:name=".LaundryCompleteActivity" />
     </application>
 

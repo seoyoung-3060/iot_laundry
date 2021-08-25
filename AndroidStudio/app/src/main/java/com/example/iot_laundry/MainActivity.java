@@ -22,7 +22,11 @@ public class MainActivity extends AppCompatActivity {
 
                 startActivity(intent);
 
+                String activityState = "start";
+                String serverAdress = "";
 
+                DryingActivity.HttpRequestTask requestTask = new DryingActivity.HttpRequestTask(serverAdress);
+                requestTask.execute(activityState);
             }
         });
 

@@ -1,6 +1,7 @@
 package com.example.iot_laundry;
 
 import android.util.Log;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,7 +20,7 @@ public class WeatherData {
     private String weather = "", rain = "", reh = "";
     private String TAG = "WeatherDatalog";
 
-    public String lookUpWeather(String baseDate, String time, String nx, String ny) throws IOException, JSONException {
+    public String lookUpWeather(String baseDate, String time, String nx, String ny, TextView weatherTextView, TextView adviceTextView) throws IOException, JSONException {
 //        String baseDate = date;
         String baseTime = timeChange(time);
         String type = "json";
@@ -98,12 +99,16 @@ public class WeatherData {
                             weather = "현재 날씨는 ";
                             if (fcstValue.equals("1")) {
                                 weather += "맑음 ";
+                                adviceTextView.setText("오늘은 맑네요! 창문/커튼을 활짝열어볼까요");
                             } else if (fcstValue.equals("2")) {
                                 weather += "비 ";
+                                adviceTextView.setText("오늘은 비가오네요! 창문/커튼을 닫고 에어컨켜는것을 추천드려요");
                             } else if (fcstValue.equals("3")) {
                                 weather += "구름많음 ";
+                                adviceTextView.setText("오늘은 구름이 많네요! 창문열어도 괜찮을것같아요");
                             } else if (fcstValue.equals("4")) {
                                 weather += "흐림 ";
+                                adviceTextView.setText("오늘은 흐리네요! 창문열어도 괜찮을것같아요");
                             }
                         }
 
@@ -118,6 +123,7 @@ public class WeatherData {
                         Log.i("날씨", fcstValue);
                         Log.i("카테고리", category);
                         Log.i("현재날씨", weather+rain+reh);
+                        weatherTextView.setText(weather+rain+reh);
                     }
 
                 } catch (MalformedURLException e) {
