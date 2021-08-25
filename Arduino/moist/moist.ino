@@ -68,11 +68,11 @@ void loop() {
     }  
     delay(1000);  
       
-    //건조 완료되면 프로그램 종료  
-    if (Firebase.getFloat("moist") < 5) { 
-      Serial.println("건조가 완료되었습니다");   //디버깅용
-      return;                         
-    }
+//    //건조 완료되면 프로그램 종료  
+//    if (Firebase.getFloat("moist") < 5) { 
+//      Serial.println("건조가 완료되었습니다");   //디버깅용
+//      return;                         
+//    }
   }
 
 }  
