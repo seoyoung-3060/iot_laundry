@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 String weather = "";
                 WeatherData weatherData = new WeatherData();
                 try {
-                    weather = weatherData.lookUpWeather(date, time, x, y);
+                    weather = weatherData.lookUpWeather(date, time, x, y, weatherTextView);
 
                     Log.d(TAG, weather);
                     Log.d(TAG, "널 ㅋ");

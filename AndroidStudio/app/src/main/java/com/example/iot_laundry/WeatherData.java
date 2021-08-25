@@ -1,6 +1,7 @@
 package com.example.iot_laundry;
 
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -16,15 +17,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import retrofit2.http.HEAD;
+
 public class WeatherData {
     private String weather = "", rain = "", reh = "";
     private String TAG = "WeatherDatalog";
-<<<<<<< HEAD
-=======
 
->>>>>>> Add Textview
 
-    public String lookUpWeather(String baseDate, String time, String nx, String ny) throws IOException, JSONException {
+    public String lookUpWeather(String baseDate, String time, String nx, String ny, TextView weatherTextView) throws IOException, JSONException {
 //        String baseDate = date;
         String baseTime = timeChange(time);
         String type = "json";
@@ -52,7 +52,6 @@ public class WeatherData {
             public void run() {
                 try {
                     URL url = new URL(urlBuilder.toString());
-<<<<<<< HEAD
                     Log.i("url주소", String.valueOf(url));
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
@@ -78,28 +77,6 @@ public class WeatherData {
 
                     String result = sb.toString();
 
-=======
-                    Log.i("1url주소", String.valueOf(url));
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("GET");
-                    conn.setRequestProperty("Content-type", "application/json");
-                    Log.d(TAG, "1메서드호출전");
-
-                    Log.d(TAG, "포핰"+ String.valueOf(conn.getResponseCode()));
-                    InputStream stream = conn.getInputStream();
-                    InputStreamReader reader = new InputStreamReader(stream);
-                    BufferedReader bufferedReader = new BufferedReader(reader);
-                    String li;
-                    StringBuilder sb2 = new StringBuilder();
-                    while ((li = bufferedReader.readLine()) != null) {
-                        sb2.append(li);
-                    }
-                    Log.d(TAG, "결과2:"+ sb2.toString());
-
-                    bufferedReader.close();
-
-                    String result = sb2.toString();
->>>>>>> Add Textview
                     // response 키를 가지고 데이터를 파싱
                     JSONObject jsonObj_1 = new JSONObject(result);
                     String response = jsonObj_1.getString("response");
@@ -125,7 +102,6 @@ public class WeatherData {
                         if (category.equals("SKY")) {
                             weather = "현재 날씨는 ";
                             if (fcstValue.equals("1")) {
-<<<<<<< HEAD
                                 weather += "맑음";
                             } else if (fcstValue.equals("2")) {
                                 weather += "비";
@@ -133,15 +109,6 @@ public class WeatherData {
                                 weather += "구름많음";
                             } else if (fcstValue.equals("4")) {
                                 weather += "흐림";
-=======
-                                weather += "맑은 상태로";
-                            } else if (fcstValue.equals("2")) {
-                                weather += "비가 오는 상태로 ";
-                            } else if (fcstValue.equals("3")) {
-                                weather += "구름이 많은 상태로 ";
-                            } else if (fcstValue.equals("4")) {
-                                weather += "흐린 상태로 ";
->>>>>>> Add Textview
                             }
                         }
 
@@ -153,22 +120,12 @@ public class WeatherData {
                             reh = "습도 : " + fcstValue + "%";
                         }
 
-<<<<<<< HEAD
                         Log.i("날씨", fcstValue);
                         Log.i("카테고리", category);
                         Log.i("현재날씨", weather+rain+reh);
+                        weatherTextView.setText(weather);
                     }
 
-=======
-//                        Log.i("날씨", fcstValue);
-//                        Log.i("카테고리", category);
-//                        Log.i("현재날씨", weather+rain+reh);
-
-                    }
-
-
-
->>>>>>> Add Textview
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -178,10 +135,7 @@ public class WeatherData {
                 }
             }
         }).start();
-<<<<<<< HEAD
-=======
 
->>>>>>> Add Textview
         return weather + rain + reh;
     }
 
