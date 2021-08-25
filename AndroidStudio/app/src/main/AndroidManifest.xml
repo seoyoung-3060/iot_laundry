@@ -18,25 +18,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.IOT_Laundry"
         android:usesCleartextTraffic="true">
-        <activity android:name=".BluetoothActivity02">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".BluetoothActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".LaundryCompleteActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".DryingActivity">
+        </activity>
+        <activity android:name=".LaundryCompleteActivity" />
     </application>
 
 </manifest>
