@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
     TextView dateTextView;
+    TextView weatherTextView;
 
     private GPSTracker gpsTracker;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -62,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         dateTextView = (TextView)findViewById(R.id.textViewTime);
+
+        weatherTextView = (TextView)findViewById(R.id.textViewWeather);
 
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
@@ -109,9 +112,9 @@ public class MainActivity extends AppCompatActivity {
                 WeatherData weatherData = new WeatherData();
                 try {
                     weather = weatherData.lookUpWeather(date, time, x, y);
-//                            weather = weatherData.lookUpWeather("20210825", "0200", "60", "125");
-//                            weather = weatherData.lookUpWeather("20210825", "2300", "57", "128");
+
                     Log.d(TAG, weather);
+                    Log.d(TAG, "널 ㅋ");
                 } catch (JSONException e) {
                     Log.i("WEATHER_JSONERROR", e.getMessage());
                 } catch (IOException e) {
@@ -119,9 +122,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Log.i("현재날씨",weather);
 
+                weatherTextView.setText(weather);
                 textViewLocation.setText(address);
 
-//                        Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
             }
 
         });
@@ -136,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (workbook != null) {
                 Sheet sheet = workbook.getSheet(0); // 시트 불러오기
+
                 if(sheet != null) {
                     int colTotal = sheet.getColumns(); //전체 칼럼
                     int rowIndexStart = 1;             //row 인덱스 시작
@@ -150,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
-            }
+            } else Log.d(TAG, "우ㅓ크북 널");
         } catch (IOException e) {
             Log.i("READ_EXCEL1", e.getMessage());
             e.printStackTrace();
@@ -310,6 +314,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+
 /** END OF CODE **/
 //switch (v.getId()){
 //        case R.id.reset_button:
+
