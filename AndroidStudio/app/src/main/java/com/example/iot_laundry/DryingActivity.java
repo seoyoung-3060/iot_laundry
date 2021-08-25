@@ -7,14 +7,17 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,10 +26,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.example.iot_laundry.Utils.MyServer;
+
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -127,8 +133,6 @@ public class DryingActivity extends AppCompatActivity {
                 WeatherData weatherData = new WeatherData();
                 try {
                     weather = weatherData.lookUpWeather(date, time, x, y, weatherTextView, adviceTextView);
-//                            weather = weatherData.lookUpWeather("20210825", "0200", "60", "125");
-//                            weather = weatherData.lookUpWeather("20210825", "2300", "57", "128");
                     Log.d(TAG, weather);
                 } catch (JSONException e) {
                     Log.i("WEATHER_JSONERROR", e.getMessage());
@@ -144,8 +148,6 @@ public class DryingActivity extends AppCompatActivity {
 
         });
 
-        String serverAdress = "";
-
         ac_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
 
             @Override
@@ -158,7 +160,7 @@ public class DryingActivity extends AppCompatActivity {
                     ac_status = "acOff";
                     Log.i("ac","acoff");
                 }
-                HttpRequestTask requestTask = new HttpRequestTask(serverAdress);
+                HttpRequestTask requestTask = new HttpRequestTask();
                 requestTask.execute(ac_status);
             }
         });
@@ -172,7 +174,7 @@ public class DryingActivity extends AppCompatActivity {
                 } else {
                     curtain_status = "cOff";
                 }
-                HttpRequestTask requestTask = new HttpRequestTask(serverAdress);
+                HttpRequestTask requestTask = new HttpRequestTask();
                 requestTask.execute(curtain_status);
             }
         });
@@ -185,9 +187,8 @@ public class DryingActivity extends AppCompatActivity {
 
                 } else {
                     window_status = "winOff";
-
                 }
-                HttpRequestTask requestTask = new HttpRequestTask(serverAdress);
+                HttpRequestTask requestTask = new HttpRequestTask();
                 requestTask.execute(window_status);
             }
         });
@@ -376,14 +377,20 @@ public class DryingActivity extends AppCompatActivity {
     }
 
     public static class HttpRequestTask extends AsyncTask<String, Void, String> {
-        private String serverAdress;
+        private String serverAdress = MyServer.getServerAddress();
+        private String TAG = "HttpRequestTask";
+
         public HttpRequestTask(String serverAdress) {
             this.serverAdress = serverAdress;
         }
+        public HttpRequestTask( ) { }
         @Override
         protected String doInBackground(String... params) {
+            Log.d(TAG, "doInBackground호출");
+
             String val = params[0];
-            final String url = "http://"+serverAdress + "/" + val;
+            final String url = "http://"+ serverAdress + "/" + val;
+            Log.d(TAG, "url: " + url);
 
             //okHttp 라이브러리를 사용한다.
             OkHttpClient client = new OkHttpClient();
