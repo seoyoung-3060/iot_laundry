@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), DryingActivity.class);
+                //시작 시의 수분센서값 넘겨주어야 함
 
                 startActivity(intent);
 

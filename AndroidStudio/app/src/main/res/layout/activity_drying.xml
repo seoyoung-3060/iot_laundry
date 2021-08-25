@@ -51,7 +51,7 @@
             android:orientation="vertical"
             android:gravity="center_horizontal">
             <ToggleButton
-                android:id="@+id/ac_btn"
+                android:id="@+id/toggleAC"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
@@ -67,7 +67,7 @@
                 android:layout_weight="1"
                 android:gravity="center_horizontal">
                 <ToggleButton
-                    android:id="@+id/window_btn"
+                    android:id="@+id/toggleWindow"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <TextView
@@ -82,7 +82,7 @@
                 android:layout_weight="1"
                 android:gravity="center_horizontal">
                 <ToggleButton
-                    android:id="@+id/curtain_btn"
+                    android:id="@+id/toggleCurtain"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <TextView
@@ -107,7 +107,7 @@
         android:id="@+id/progressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:max="6"
+        android:max="60"
         android:progress="1"
         style="?android:attr/progressBarStyleHorizontal"/>
 

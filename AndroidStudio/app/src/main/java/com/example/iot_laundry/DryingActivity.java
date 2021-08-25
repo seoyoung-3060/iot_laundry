@@ -3,30 +3,45 @@ package com.example.iot_laundry;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.iot_laundry.Utils.MyServer;
+import com.example.iot_laundry.firebase.MyFirebase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 
@@ -71,21 +86,101 @@ public class DryingActivity extends AppCompatActivity {
     private String x="", y="", address = "";
     private String date = "", time = "", total_date="";
 
-    private String TAG = "MainActivitylog";
+    private String TAG = "DryingActivityLog";
 
+    ToggleButton toggleAC, toggleCurtain, toggleWindow;
+//    ToggleButton[] toggleButtonList = {toggleAC, toggleCurtain, toggleWindow};
+
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        createNotificationChannel();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drying);
+
+        //init view
+        progressBar = findViewById(R.id.progressBar);
 
         dateTextView = (TextView)findViewById(R.id.textViewTime);
         weatherTextView = (TextView)findViewById(R.id.textViewWeather);
         adviceTextView = (TextView)findViewById(R.id.textViewAdvice);
 
-        ac_button = (ToggleButton)findViewById(R.id.ac_btn);
-        curtain_button = (ToggleButton)findViewById(R.id.curtain_btn);
-        window_button = (ToggleButton)findViewById(R.id.window_btn);
+        //toggle button
+        toggleAC = findViewById(R.id.toggleAC);
+        toggleCurtain = findViewById(R.id.toggleCurtain);
+        toggleWindow = findViewById(R.id.toggleWindow);
+
+
+        toggleAC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = toggleAC.isChecked();
+                MyFirebase.acRef.setValue(isChecked);
+
+                String ac_status;
+                if (isChecked){
+                    ac_status = "acOn";
+                } else {
+                    ac_status = "acOff";
+                }
+                Log.i("ac", ac_status);
+                HttpRequestTask requestTask = new HttpRequestTask();
+                requestTask.execute(ac_status);
+            }
+        });
+        toggleCurtain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = toggleCurtain.isChecked();
+                MyFirebase.curtRet.setValue(isChecked);
+
+                String curtain_status;
+                if (isChecked){
+                    curtain_status = "curtOn";
+                } else {
+                    curtain_status = "curtOff";
+                }
+                HttpRequestTask requestTask = new HttpRequestTask();
+                requestTask.execute(curtain_status);
+            }
+        });
+        toggleWindow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = toggleWindow.isChecked();
+                MyFirebase.winRet.setValue(isChecked);
+
+                String window_status;
+                if (isChecked){
+                    window_status = "winOn";
+                } else {
+                    window_status = "winOff";
+                }
+                HttpRequestTask requestTask = new HttpRequestTask();
+                requestTask.execute(window_status);
+            }
+        });
+
+        MyFirebase.moistRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String moistStr = String.valueOf((Long) dataSnapshot.getValue());
+                Log.d(TAG, "moistRef");
+                int moist =  Integer.parseInt(moistStr);
+//                tem.setText(tem2);
+                progressBar.setProgress(60-moist);
+                if (moist < 5) {
+//                    builder.show();
+                    sendNotification();
+                    Log.d(TAG, "건조완료, moist: " + moist);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
@@ -147,52 +242,6 @@ public class DryingActivity extends AppCompatActivity {
             }
 
         });
-
-        ac_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String ac_status;
-                if (isChecked){
-                    ac_status = "acOn";
-                    Log.i("ac","acon");
-                } else {
-                    ac_status = "acOff";
-                    Log.i("ac","acoff");
-                }
-                HttpRequestTask requestTask = new HttpRequestTask();
-                requestTask.execute(ac_status);
-            }
-        });
-        curtain_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String curtain_status;
-                if (isChecked){
-                    curtain_status = "cOn";
-
-                } else {
-                    curtain_status = "cOff";
-                }
-                HttpRequestTask requestTask = new HttpRequestTask();
-                requestTask.execute(curtain_status);
-            }
-        });
-        window_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String window_status;
-                if (isChecked){
-                    window_status = "winOn";
-
-                } else {
-                    window_status = "winOff";
-                }
-                HttpRequestTask requestTask = new HttpRequestTask();
-                requestTask.execute(window_status);
-            }
-        });
-
 
     }
 
@@ -375,6 +424,53 @@ public class DryingActivity extends AppCompatActivity {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
+    private void createNotificationChannel() {
+        String channelId = "one-channel";
+        String channelName = "My Channel One1";
+        String channelDescription = "My Channel One Description";
+
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+            channel.setDescription(channelDescription);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+    private void sendNotification() {
+        Intent intent = new Intent(this, LaundryCompleteActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        intent.putExtra("AnotherActivity", TrueOrFalse);
+//        intent.putExtra("imageUri", imageUri);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+
+//        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.laundrydrying)
+//                .setSmallIcon(IconCompat.createWithBitmap(image))
+//                .setLargeIcon(image) //not work
+//                .setContentTitle(messageBody)
+                .setContentTitle("건조가 완료되었습니다")
+                .setContentText("건조완료")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                .setStyle(new NotificationCompat.BigPictureStyle()
+//                        .bigPicture(image))/*Notification with Image*/
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+    }
 
     public static class HttpRequestTask extends AsyncTask<String, Void, String> {
         private String serverAdress = MyServer.getServerAddress();
@@ -420,4 +516,51 @@ public class DryingActivity extends AppCompatActivity {
 
     }
 }
+
+
 /** END OF CODE **/
+//switch (v.getId()){
+//        case R.id.reset_button:
+
+//온체크드체인지리스너
+// ac_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+//@Override
+//public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//        String ac_status;
+//        if (isChecked){
+//        ac_status = "acOn";
+//        Log.i("ac","acon");
+//        } else {
+//        ac_status = "acOff";
+//        Log.i("ac","acoff");
+//        }
+//        HttpRequestTask requestTask = new HttpRequestTask();
+//        requestTask.execute(ac_status);
+//        }
+//        });
+//        curtain_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+//@Override
+//public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//        String curtain_status;
+//        if (isChecked){
+//        curtain_status = "cOn";
+//        } else {
+//        curtain_status = "cOff";
+//        }
+//        HttpRequestTask requestTask = new HttpRequestTask();
+//        requestTask.execute(curtain_status);
+//        }
+//        });
+//        window_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+//@Override
+//public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//        String window_status;
+//        if (isChecked){
+//        window_status = "winOn";
+//        } else {
+//        window_status = "winOff";
+//        }
+//        HttpRequestTask requestTask = new HttpRequestTask();
+//        requestTask.execute(window_status);
+//        }
+//        });

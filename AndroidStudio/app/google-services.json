@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "126139249183",
+    "firebase_url": "https://iot-laundry02-default-rtdb.firebaseio.com",
+    "project_id": "iot-laundry02",
+    "storage_bucket": "iot-laundry02.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:126139249183:android:fdb56f817308dcde92db2a",
+        "android_client_info": {
+          "package_name": "com.example.iot_laundry"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "126139249183-0ohfd4gvflmqbv5kl0iv6ir3uvtlcrna.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3dxLwbIhMFEwhhlG4_JDJ0TregaQ96ao"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "126139249183-0ohfd4gvflmqbv5kl0iv6ir3uvtlcrna.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
