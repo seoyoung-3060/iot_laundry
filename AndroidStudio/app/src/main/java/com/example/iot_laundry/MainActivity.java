@@ -7,10 +7,6 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -28,12 +24,10 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import jxl.Sheet;
 import jxl.Workbook;
@@ -41,11 +35,11 @@ import jxl.read.biff.BiffException;
 
 public class MainActivity extends AppCompatActivity {
     //현재시간&날짜 가져오기
-    long now;
+    long now; //ll
     Date Date;
     SimpleDateFormat mFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss"); //dateFormat바꿈
     //date와 time String으로 가져오기
-    SimpleDateFormat timeFormat = new SimpleDateFormat("HHmm");
+    SimpleDateFormat timeFormat = new SimpleDateFormat("HH00");     //HHmm이었던거 HH00으로 바꿈
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
     TextView dateTextView;
@@ -59,13 +53,15 @@ public class MainActivity extends AppCompatActivity {
     private String x="", y="", address = "";
     private String date = "", time = "", total_date="";
 
+    private String TAG = "MainActivitylog";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        dateTextView = (TextView)findViewById(R.id.time);
+        dateTextView = (TextView)findViewById(R.id.textViewTime);
 
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
@@ -73,67 +69,61 @@ public class MainActivity extends AppCompatActivity {
             checkRunTimePermission();
         }
 
-        final TextView textview_address = (TextView)findViewById(R.id.location);
+        final TextView textViewLocation = (TextView)findViewById(R.id.textViewLocation);
+        Button buttonShowLocation = (Button) findViewById(R.id.reset_button);
 
-        Button ShowLocationButton = (Button) findViewById(R.id.reset_button);
-
-        ShowLocationButton.setOnClickListener(new View.OnClickListener()
-        {
+        buttonShowLocation.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                switch (v.getId()){
-                    case R.id.reset_button:
-                        gpsTracker = new GPSTracker(MainActivity.this);
+            public void onClick(View v) {
+                // 현재 시간 및 날짜 얻어오기
+                now = System.currentTimeMillis(); //현재 시간 가져오기
+                Date = new Date(now);             //Date 생성하기
 
-                        now = System.currentTimeMillis();
-                        Date = new Date(now);
+                total_date = mFormat.format(Date);
+                dateTextView.setText(total_date);
 
-                        //이부분에서 오류나는것으로 확인됨
+                time = timeFormat.format(Date);
+                date = dateFormat.format(Date);
 
-                        total_date = mFormat.format(Date);
-                        dateTextView.setText(total_date);
+                Log.i("total_date",total_date);
+                Log.i("time",time);
+                Log.i("date",date);
 
-                        time = timeFormat.format(Date);
-                        date = dateFormat.format(Date);
+                // GPS 위치 얻어오기
+                gpsTracker = new GPSTracker(MainActivity.this);
+                double latitude = gpsTracker.getLatitude();
+                double longitude = gpsTracker.getLongitude();
 
-                        Log.i("total_date",total_date);
-                        Log.i("time",time);
-                        Log.i("date",date);
+                address = getCurrentAddress(latitude, longitude);
+                Log.i("address",address);
 
-                        double latitude = gpsTracker.getLatitude();
-                        double longitude = gpsTracker.getLongitude();
+                String[] local = address.split(" "); //local[0]==대한민국 local[1]==부산광역시 local[2]==금정구 local[3]==장전동
+                String localName = local[2];//'구'이름 불러옴
 
-                        address = getCurrentAddress(latitude, longitude);
-                        Log.i("address",address);
+                readExcel(localName); //행정시 이름으로 격자값 구하기
+                Toast.makeText(MainActivity.this, localName, Toast.LENGTH_LONG).show();
 
-                        String[] local = address.split(" "); //local[0]==대한민국 local[1]==부산광역시 local[2]==금정구 local[3]==장전동
-                        String localName = local[2];//'구'이름 불러옴
+                Log.i("localname",localName);
 
-                        readExcel(localName);
-                        Toast.makeText(MainActivity.this, localName, Toast.LENGTH_LONG).show();
+                String weather = "";
+                WeatherData weatherData = new WeatherData();
+                try {
+                    weather = weatherData.lookUpWeather(date, time, x, y);
+//                            weather = weatherData.lookUpWeather("20210825", "0200", "60", "125");
+//                            weather = weatherData.lookUpWeather("20210825", "2300", "57", "128");
+                    Log.d(TAG, weather);
+                } catch (JSONException e) {
+                    Log.i("WEATHER_JSONERROR", e.getMessage());
+                } catch (IOException e) {
+                    Log.i("WEATHER_IOERROR",e.getMessage());
+                }
+                Log.i("현재날씨",weather);
 
-                        Log.i("localname",localName);
-                        
-                        String weather = "";
-                        WeatherData weatherData = new WeatherData();
-                        try {
-                            weather = weatherData.lookUpWeather(date, time, x, y);
-                        } catch (JSONException e) {
-                            Log.i("WEATHER_JSONERROR", e.getMessage());
-                        } catch (IOException e) {
-                            Log.i("WEATHER_IOERROR",e.getMessage());
-                        }
-                        Log.i("현재날씨",weather);
-
-                        textview_address.setText(address);
+                textViewLocation.setText(address);
 
 //                        Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
-                        break;
-                    default:
-                        break;
-                }
             }
+
         });
 
 
@@ -141,14 +131,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void readExcel(String localName) {
         try {
-            InputStream inputStream = getBaseContext().getResources().getAssets().open("local_name.xlsx");
+            InputStream inputStream = getBaseContext().getResources().getAssets().open("local_name.xls");
             Workbook workbook = Workbook.getWorkbook(inputStream);
 
             if (workbook != null) {
-                Sheet sheet = workbook.getSheet(0);
+                Sheet sheet = workbook.getSheet(0); // 시트 불러오기
                 if(sheet != null) {
-                    int colTotal = sheet.getColumns();
-                    int rowIndexStart = 1;
+                    int colTotal = sheet.getColumns(); //전체 칼럼
+                    int rowIndexStart = 1;             //row 인덱스 시작
                     int rowTotal = sheet.getColumn(colTotal - 1).length;
 
                     for (int row = rowIndexStart; row < rowTotal; row++) {
@@ -168,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("READ_EXCEL1", e.getMessage());
             e.printStackTrace();
         }
-        Log.i("격자값", "x="+x+" y="+y);
+        Log.i("격자값", "x = " + x + "  y = " + y);
     }
 
 
@@ -179,24 +169,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /*
-     * ActivityCompat.requestPermissions를 사용한 퍼미션 요청의 결과를 리턴받는 메소드입니다.
-     */
+    // ActivityCompat.requestPermissions를 사용한 퍼미션 요청의 결과를 리턴받는 메소드입니다.
     @Override
-    public void onRequestPermissionsResult(int permsRequestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grandResults) {
-
+    public void onRequestPermissionsResult(int permsRequestCode, @NonNull String[] permissions, @NonNull int[] grandResults) {
         super.onRequestPermissionsResult(permsRequestCode, permissions, grandResults);
         if (permsRequestCode == PERMISSIONS_REQUEST_CODE && grandResults.length == REQUIRED_PERMISSIONS.length) {
-
             // 요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면
-
             boolean check_result = true;
 
-
             // 모든 퍼미션을 허용했는지 체크합니다.
-
             for (int result : grandResults) {
                 if (result != PackageManager.PERMISSION_GRANTED) {
                     check_result = false;
@@ -204,25 +185,17 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-
             if (check_result) {
-
                 //위치 값을 가져올 수 있음
-                ;
             } else {
                 // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다.2 가지 경우가 있습니다.
-
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])
                         || ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1])) {
 
                     Toast.makeText(MainActivity.this, "퍼미션이 거부되었습니다. 앱을 다시 실행하여 퍼미션을 허용해주세요.", Toast.LENGTH_LONG).show();
                     finish();
-
-
                 } else {
-
                     Toast.makeText(MainActivity.this, "퍼미션이 거부되었습니다. 설정(앱 정보)에서 퍼미션을 허용해야 합니다. ", Toast.LENGTH_LONG).show();
-
                 }
             }
 
@@ -237,37 +210,29 @@ public class MainActivity extends AppCompatActivity {
         int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.ACCESS_COARSE_LOCATION);
 
-
         if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
                 hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
-
             // 2. 이미 퍼미션을 가지고 있다면
             // ( 안드로이드 6.0 이하 버전은 런타임 퍼미션이 필요없기 때문에 이미 허용된 걸로 인식합니다.)
 
             // 3.  위치 값을 가져올 수 있음
 
         } else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요합니다. 2가지 경우(3-1, 4-1)가 있습니다.
-
             // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, REQUIRED_PERMISSIONS[0])) {
-
                 // 3-2. 요청을 진행하기 전에 사용자가에게 퍼미션이 필요한 이유를 설명해줄 필요가 있습니다.
                 Toast.makeText(MainActivity.this, "이 앱을 실행하려면 위치 접근 권한이 필요합니다.", Toast.LENGTH_LONG).show();
                 // 3-3. 사용자게에 퍼미션 요청을 합니다. 요청 결과는 onRequestPermissionResult에서 수신됩니다.
                 ActivityCompat.requestPermissions(MainActivity.this, REQUIRED_PERMISSIONS,
                         PERMISSIONS_REQUEST_CODE);
-
             } else {
                 // 4-1. 사용자가 퍼미션 거부를 한 적이 없는 경우에는 퍼미션 요청을 바로 합니다.
                 // 요청 결과는 onRequestPermissionResult에서 수신됩니다.
                 ActivityCompat.requestPermissions(MainActivity.this, REQUIRED_PERMISSIONS,
                         PERMISSIONS_REQUEST_CODE);
             }
-
         }
-
     }
-
 
     public String getCurrentAddress( double latitude, double longitude) {
         //지오코더... GPS를 주소로 변환
@@ -294,7 +259,6 @@ public class MainActivity extends AppCompatActivity {
         Address address = addresses.get(0);
         return address.getAddressLine(0).toString()+"\n";
     }
-
 
     //여기부터는 GPS 활성화를 위한 메소드들
     private void showDialogForLocationServiceSetting() {
@@ -323,7 +287,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         switch (requestCode) {
             case GPS_ENABLE_REQUEST_CODE:
                 //사용자가 GPS 활성 시켰는지 검사
@@ -347,3 +310,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+/** END OF CODE **/
+//switch (v.getId()){
+//        case R.id.reset_button:
