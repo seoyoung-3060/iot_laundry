@@ -390,7 +390,8 @@ public class DryingActivity extends AppCompatActivity {
         }
 
         Address address = addresses.get(0);
-        return address.getAddressLine(0).toString()+"\n";
+//        return address.getAddressLine(0).toString()+"\n";
+        return address.getAddressLine(0).toString();
     }
 
     //여기부터는 GPS 활성화를 위한 메소드들

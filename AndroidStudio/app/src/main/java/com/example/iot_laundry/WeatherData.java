@@ -96,7 +96,7 @@ public class WeatherData {
                         String category = jsonObj_4.getString("category");
 
                         if (category.equals("SKY")) {
-                            weather = "현재 날씨는 ";
+                            weather = "현재 날씨: ";
                             if (fcstValue.equals("1")) {
                                 weather += "맑음 ";
                                 adviceTextView.setText("오늘은 맑네요! 창문/커튼을 활짝열어볼까요");

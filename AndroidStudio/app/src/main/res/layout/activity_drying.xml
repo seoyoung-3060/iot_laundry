@@ -13,28 +13,32 @@
         android:id="@+id/textViewTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="time" />
+        android:text="현재 시각" />
     <TextView
         android:id="@+id/textViewLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="location" />
+        android:text="위치" />
 
     <TextView
         android:id="@+id/textViewWeather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="현재날씨" />
+        android:text="현재 날씨: 흐림 강수확률: 30% 습도: 80%" />
 
     <TextView
         android:id="@+id/textViewAdvice"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="오늘은 흐리네요! 창문 열어도 괜찮을 것 같아요"/>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/reset_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/bg_round_stroke_thin"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
         android:text="Reload" />
 
     <View style="@style/divider_style"
@@ -149,9 +153,6 @@
             android:progress="65" />
     </RelativeLayout>
 
-    <View style="@style/divider_style"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"/>
 
 
 
