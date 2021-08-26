@@ -32,15 +32,15 @@ void setup() {
   Serial.begin(9600);
   myservo.attach(SERVOPIN);
 
-    // connect to wifi.  
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);  
-  Serial.print("connecting");  
-  while (WiFi.status() != WL_CONNECTED) {  
-    Serial.print(".");  
-    delay(500);  
-  }  
-  Serial.println();  
-  Serial.print("connected: ");  
+  // connect to wifi.
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("connecting");
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(500);
+  }
+  Serial.println();
+  Serial.print("connected: ");
   Serial.println(WiFi.localIP());
 
   //server
@@ -70,36 +70,35 @@ void buttonControl() {
   }
 }
 
-  void loop() {
-    /** 클라이언트(앱) 처리. 연결 안됐으면 return; **/
+void loop() {
+  /** 클라이언트(앱) 처리. 연결 안됐으면 return; **/
   WiFiClient client = server.available();
-  if(!client) {
+  if (!client) {
     return;
   }
   Serial.println("앱으로부터 연결 완료, 건조 시스템 시작");
-  while(!client.available()){
+  while (!client.available()) {
     delay(1);
   }
   String request = client.readStringUntil('\r');
   Serial.println(request);
   client.flush();
 
-        /** 클라이언트(앱) 과 연결 됐다면, **/
-      if (Firebase.getFloat("moist") < 5) {
-        Serial.println("건조가 완료되었습니다");   //디버깅용
-        buttonControl(); //서보모터 제어 함수
-        return;
-      } 
-
-    if(request.indexOf("/acOn")>0) {
-      buttonControl();
-      else if(request.indexOf("/acOff")>0) {
-        buttonControl();
-      }
-      else {
-        delay(2000); //테스트용, 2초 마다 파이어베이스의 moist값 읽음
-        //    delay(500000); //시현용, 5분
-      }
-    }
-    
+  /** 클라이언트(앱) 과 연결 됐다면, **/
+  if (Firebase.getFloat("moist") < 5) {
+    Serial.println("건조가 완료되었습니다");   //디버깅용
+    buttonControl(); //서보모터 제어 함수
+    return;
   }
+
+  if (request.indexOf("/acOn") > 0) {
+    buttonControl();
+  }
+  else if (request.indexOf("/acOff") > 0) {
+    buttonControl();
+  }
+  else {
+    delay(2000); //테스트용, 2초 마다 파이어베이스의 moist값 읽음
+    //    delay(500000); //시현용, 5분
+  }
+}
