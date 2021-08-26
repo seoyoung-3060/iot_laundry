@@ -10,12 +10,11 @@
     android:gravity="center">
 
 
-
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/laundrydrying"/>
+        android:src="@drawable/laundrydrying" />
 
     <TextView
         android:layout_width="wrap_content"

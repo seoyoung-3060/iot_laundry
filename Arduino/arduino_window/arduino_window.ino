@@ -40,7 +40,7 @@ void anticlockwise() {
   }
 }
 void clockwise() {
-  for(int i=1; i<12; i++) {
+  for(int i=1; i<3; i++) {
     myStepper.step(-stepsPerRevolution);
     Serial.println(i);
   }
