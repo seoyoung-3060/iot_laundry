@@ -19,13 +19,12 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.iot_laundry.Utils.MyServer;
+import com.example.iot_laundry.firebase.MyFirebase;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class MainActivity extends AppCompatActivity {
-    String HOST_NAME;
-    String HOST_ADDRESS;
     private String TAG = "MainActivityLog";
     Button buttonStart;
 
@@ -41,26 +40,21 @@ public class MainActivity extends AppCompatActivity {
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MyFirebase.startRef.setValue(true); //시스템 가동 중임
                 Intent intent = new Intent(getApplicationContext(), DryingActivity.class);
                 //시작 시의 수분센서값 넘겨주어야 함
 
                 startActivity(intent);
 
                 String activityState = "start";
-                String serverAddress = "";
-
+//                DryingActivity.HttpRequestTask httpRequestTask = new DryingActivity.HttpRequestTask();
                 DryingActivity.HttpRequestTask requestTask = new DryingActivity.HttpRequestTask();
                 requestTask.execute(activityState);
             }
         });
 
     }
-    private String getHostIp() {
-        Context context = getApplicationContext();
-        WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
-        return ip;
-    }
+
     private final BroadcastReceiver wifiEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context_, Intent intent) {
@@ -69,9 +63,6 @@ public class MainActivity extends AppCompatActivity {
                 NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
                 if(networkInfo.getType() == ConnectivityManager.TYPE_WIFI && networkInfo.isConnected()) {
                     Toast.makeText(context_, "WIFI 연결 상태입니다.", Toast.LENGTH_SHORT).show();
-                    String ip = getHostIp();
-                    MyServer myServer = new MyServer();
-                    myServer.setServerAddress(ip);
                     buttonStart.setEnabled(true);
 
                 } else {
