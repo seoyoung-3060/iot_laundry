@@ -16,8 +16,11 @@
 #define FIREBASE_HOST "iot-laundry02-default-rtdb.firebaseio.com"
 #define FIREBASE_AUTH "qlNCOwAypMDI1bjWPus5Szvs32lTDu1EDkRqEqiy"
 
-#define WIFI_SSID "SK_WiFiGIGA2B95"
-#define WIFI_PASSWORD "1603064717"
+//#define WIFI_SSID "SK_WiFiGIGA2B95"  
+//#define WIFI_PASSWORD "1603064717"  
+
+#define WIFI_SSID "커피나무"  
+#define WIFI_PASSWORD "000012345a" 
 
 WiFiServer server(80); //추가
 
@@ -25,7 +28,7 @@ WiFiServer server(80); //추가
 #include <Servo.h>
 Servo myservo;
 
-int SERVOPIN = 11;
+int SERVOPIN = 2; //D4번 핀
 int angle = 0;
 
 void setup() {
@@ -42,6 +45,8 @@ void setup() {
   Serial.println();
   Serial.print("connected: ");
   Serial.println(WiFi.localIP());
+
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);  
 
   //server
   server.begin();
@@ -72,6 +77,7 @@ void buttonControl() {
 
 void loop() {
   /** 클라이언트(앱) 처리. 연결 안됐으면 return; **/
+  Serial.println("요청 기다리는 중");
   WiFiClient client = server.available();
   if (!client) {
     return;
@@ -84,21 +90,25 @@ void loop() {
   Serial.println(request);
   client.flush();
 
-  /** 클라이언트(앱) 과 연결 됐다면, **/
-  if (Firebase.getFloat("moist") < 5) {
-    Serial.println("건조가 완료되었습니다");   //디버깅용
-    buttonControl(); //서보모터 제어 함수
-    return;
-  }
+  while (true) {
 
-  if (request.indexOf("/acOn") > 0) {
-    buttonControl();
-  }
-  else if (request.indexOf("/acOff") > 0) {
-    buttonControl();
-  }
-  else {
+    /** 클라이언트(앱) 과 연결 됐다면, **/
+    if (Firebase.getInt("moist") < 4) {
+      Serial.println("건조가 완료되었습니다");   //디버깅용
+      buttonControl(); //서보모터 제어 함수
+      return;
+    }
+
+    if (request.indexOf("/acOn") > 0) {
+      buttonControl();
+    }
+    else if (request.indexOf("/acOff") > 0) {
+      buttonControl();
+    }
+    else {
+
+    }
     delay(2000); //테스트용, 2초 마다 파이어베이스의 moist값 읽음
-    //    delay(500000); //시현용, 5분
+      //    delay(500000); //시현용, 5분
   }
 }

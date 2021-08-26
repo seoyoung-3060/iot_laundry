@@ -17,8 +17,11 @@
 #define FIREBASE_HOST "iot-laundry02-default-rtdb.firebaseio.com"
 #define FIREBASE_AUTH "qlNCOwAypMDI1bjWPus5Szvs32lTDu1EDkRqEqiy"
 
-#define WIFI_SSID "SK_WiFiGIGA2B95"  
-#define WIFI_PASSWORD "1603064717"  
+//#define WIFI_SSID "SK_WiFiGIGA2B95"  
+//#define WIFI_PASSWORD "1603064717"  
+
+#define WIFI_SSID "커피나무"  
+#define WIFI_PASSWORD "000012345a" 
 
 int MOISTPIN = A0;
 
@@ -72,6 +75,10 @@ void loop() {
   client.flush();
   /** **/
 
+ if (request.indexOf("/start") > 0){
+  digitalWrite(ledPin, HIGH);
+ }
+
   int startMoist = analogRead(MOISTPIN);
   Firebase.setInt("startMoist", startMoist);
 
@@ -80,7 +87,6 @@ void loop() {
     Serial.println(startMoist); 
   
 /** 클라이언트(앱) 과 연결된 후, **/
-//  while (client.connected()) {
   while (true) {
     // soil sensor
     delay(2000);  //2초 단위, 테스트용
