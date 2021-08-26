@@ -29,7 +29,6 @@
         android:layout_width="200dip"
         android:layout_height="200dip"
         app:cb_color="#99CC00"
-        
         android:tooltipText="시작"
         app:cb_pressedRingWidth="8dip" />
 <!--    android:src="@drawable/ic_action_tick"-->

@@ -164,7 +164,7 @@ public class DryingActivity extends AppCompatActivity {
         MyFirebase.startMoistRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull  DataSnapshot dataSnapshot) {
-                long startMoist = (Long) dataSnapshot.getValue();
+                startMoist = (Long) dataSnapshot.getValue();
 //                startMoist = (int) startMoistLong;
                 if (startMoist > 4) {
                     progressBar.setMax((int)startMoist);
@@ -178,7 +178,7 @@ public class DryingActivity extends AppCompatActivity {
         MyFirebase.moistRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.d(TAG, "onDataChange");
+                Log.d(TAG, "moistRef onDataChange");
 //                String moistStr = String.valueOf((Long) dataSnapshot.getValue());
 //                Log.d(TAG, "moistRef");
 //                int moist =  Integer.parseInt(moistStr);
