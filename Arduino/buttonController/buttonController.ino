@@ -16,11 +16,11 @@
 #define FIREBASE_HOST "iot-laundry02-default-rtdb.firebaseio.com"
 #define FIREBASE_AUTH "qlNCOwAypMDI1bjWPus5Szvs32lTDu1EDkRqEqiy"
 
-//#define WIFI_SSID "SK_WiFiGIGA2B95"  
-//#define WIFI_PASSWORD "1603064717"  
+#define WIFI_SSID "SK_WiFiGIGA2B95"
+#define WIFI_PASSWORD "1603064717"
 
-#define WIFI_SSID "커피나무"  
-#define WIFI_PASSWORD "000012345a" 
+//#define WIFI_SSID "커피나무"
+//#define WIFI_PASSWORD "000012345a"
 
 WiFiServer server(80); //추가
 
@@ -46,7 +46,7 @@ void setup() {
   Serial.print("connected: ");
   Serial.println(WiFi.localIP());
 
-  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);  
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
 
   //server
   server.begin();
@@ -60,8 +60,8 @@ void setup() {
 boolean on = false;
 
 void buttonControl() {
-  on = !on;
-  Serial.println(on); //버튼 on, off 유무 시리얼 모니터에 출력
+//  on = !on;
+//  Serial.println(on); //버튼 on, off 유무 시리얼 모니터에 출력
   for (angle = 0; angle < 110; angle++)
   {
     myservo.write(angle);
@@ -75,8 +75,7 @@ void buttonControl() {
   }
 }
 
-void loop() {
-  /** 클라이언트(앱) 처리. 연결 안됐으면 return; **/
+void clientcall() {
   Serial.println("요청 기다리는 중");
   WiFiClient client = server.available();
   if (!client) {
@@ -90,25 +89,76 @@ void loop() {
   Serial.println(request);
   client.flush();
 
-  while (true) {
+  if (request.indexOf("/acOn") > 0) {
+    Serial.println("acOn호출");   //디버깅용
+    buttonControl();
+    return;
+  }
+  else if (request.indexOf("/acOff") > 0) {
+    Serial.println("acOff호출");   //디버깅용
+    buttonControl();
+    return;
+  }
+  else {
+    return;
+  }
+}
 
+void loop() {
+  /** 클라이언트(앱) 처리. 연결 안됐으면 return; **/
+  clientcall();
+  while (true) {
+    Serial.println("건조 완료까지 대기중");   //디버깅용
+    clientcall();
     /** 클라이언트(앱) 과 연결 됐다면, **/
     if (Firebase.getInt("moist") < 4) {
       Serial.println("건조가 완료되었습니다");   //디버깅용
-      buttonControl(); //서보모터 제어 함수
-      return;
+      if(!on) {
+        buttonControl();
+      }
+       //서보모터 제어 함수
+      break;
     }
 
-    if (request.indexOf("/acOn") > 0) {
-      buttonControl();
-    }
-    else if (request.indexOf("/acOff") > 0) {
-      buttonControl();
-    }
-    else {
-
-    }
     delay(2000); //테스트용, 2초 마다 파이어베이스의 moist값 읽음
-      //    delay(500000); //시현용, 5분
+    //    delay(500000); //시현용, 5분
   }
+  //}
+
+  //  /** 클라이언트(앱) 처리. 연결 안됐으면 return; **/
+  //  Serial.println("요청 기다리는 중");
+  //  WiFiClient client = server.available();
+  //  if (!client) {
+  //    return;
+  //  }
+  //  Serial.println("앱으로부터 연결 완료, 건조 시스템 시작");
+  //  while (!client.available()) {
+  //    delay(1);
+  //  }
+  //  String request = client.readStringUntil('\r');
+  //  Serial.println(request);
+  //  client.flush();
+  //
+  //  while (true) {
+  //     Serial.println("건조 완료까지 대기중");   //디버깅용
+  //
+  //    /** 클라이언트(앱) 과 연결 됐다면, **/
+  //    if (Firebase.getInt("moist") < 4) {
+  //      Serial.println("건조가 완료되었습니다");   //디버깅용
+  //      buttonControl(); //서보모터 제어 함수
+  //      return;
+  //    } else if (request.indexOf("/acOn") > 0) {
+  //      Serial.println("acOn호출");   //디버깅용
+  //      buttonControl();
+  //    }
+  //    else if (request.indexOf("/acOff") > 0) {
+  //      Serial.println("acOff호출");   //디버깅용
+  //      buttonControl();
+  //    }
+  //    else {
+  //
+  //    }
+  //    delay(2000); //테스트용, 2초 마다 파이어베이스의 moist값 읽음
+  //      //    delay(500000); //시현용, 5분
+  //  }
 }
