@@ -3,10 +3,16 @@ package com.example.iot_laundry;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.AlertDialog;
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,16 +20,28 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.example.iot_laundry.Utils.MyServer;
+import com.example.iot_laundry.firebase.MyFirebase;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,9 +66,7 @@ public class DryingActivity extends AppCompatActivity {
     SimpleDateFormat timeFormat = new SimpleDateFormat("HH00");     //HHmm이었던거 HH00으로 바꿈
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
-    TextView dateTextView;
-    TextView weatherTextView;
-    TextView adviceTextView;
+    TextView dateTextView, weatherTextView, adviceTextView, textViewPercent;
 
     ToggleButton ac_button;
     ToggleButton curtain_button;
@@ -65,21 +81,131 @@ public class DryingActivity extends AppCompatActivity {
     private String x="", y="", address = "";
     private String date = "", time = "", total_date="";
 
-    private String TAG = "MainActivitylog";
+    private String TAG = "DryingActivityLog";
 
+    ToggleButton toggleAC, toggleCurtain, toggleWindow;
+//    ToggleButton[] toggleButtonList = {toggleAC, toggleCurtain, toggleWindow};
+
+    ProgressBar progressBar;
+
+    static long startMoist = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drying);
 
+        //init view
+        progressBar = findViewById(R.id.progressBar);
+
         dateTextView = (TextView)findViewById(R.id.textViewTime);
         weatherTextView = (TextView)findViewById(R.id.textViewWeather);
         adviceTextView = (TextView)findViewById(R.id.textViewAdvice);
+        textViewPercent = (TextView)findViewById(R.id.textViewPercent);
 
-        ac_button = (ToggleButton)findViewById(R.id.ac_btn);
-        curtain_button = (ToggleButton)findViewById(R.id.curtain_btn);
-        window_button = (ToggleButton)findViewById(R.id.window_btn);
+        toggleAC = findViewById(R.id.toggleAC);
+        toggleCurtain = findViewById(R.id.toggleCurtain);
+        toggleWindow = findViewById(R.id.toggleWindow);
+
+        createNotificationChannel();
+//        sendNotification();
+
+        //click listener
+        toggleAC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = toggleAC.isChecked();
+                MyFirebase.acRef.setValue(isChecked);
+
+                String ac_status;
+                if (isChecked){
+                    ac_status = "acOn";
+                } else {
+                    ac_status = "acOff";
+                }
+                Log.i("ac", ac_status);
+                HttpRequestTask requestTask = new HttpRequestTask();
+                requestTask.execute(ac_status);
+            }
+        });
+        toggleCurtain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = toggleCurtain.isChecked();
+                MyFirebase.curtRet.setValue(isChecked);
+
+                String curtain_status;
+                if (isChecked){
+                    curtain_status = "curtOn";
+                } else {
+                    curtain_status = "curtOff";
+                }
+                HttpRequestTask requestTask = new HttpRequestTask();
+                requestTask.execute(curtain_status);
+            }
+        });
+        toggleWindow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isChecked = toggleWindow.isChecked();
+                MyFirebase.winRet.setValue(isChecked);
+
+                String window_status;
+                if (isChecked){
+                    window_status = "winOn";
+                } else {
+                    window_status = "winOff";
+                }
+                HttpRequestTask requestTask = new HttpRequestTask();
+                requestTask.execute(window_status);
+            }
+        });
+
+        MyFirebase.startMoistRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull  DataSnapshot dataSnapshot) {
+                long startMoist = (Long) dataSnapshot.getValue();
+//                startMoist = (int) startMoistLong;
+                if (startMoist > 4) {
+                    progressBar.setMax((int)startMoist);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull  DatabaseError error) {
+            }
+        });
+
+        MyFirebase.moistRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange");
+//                String moistStr = String.valueOf((Long) dataSnapshot.getValue());
+//                Log.d(TAG, "moistRef");
+//                int moist =  Integer.parseInt(moistStr);
+                long moist = (Long) dataSnapshot.getValue();
+                Log.d(TAG, "moist: "+moist);
+                Log.d(TAG, "startMoist: "+startMoist);
+
+                if (startMoist > 4) {
+                    progressBar.setProgress((int) (startMoist - moist));
+                    Log.d(TAG, String.valueOf(startMoist - moist));
+                    double percent = Math.round(((double) (startMoist - moist) / (double) startMoist) * 100);
+                    Log.d(TAG, "percent: "+percent);
+                    Log.d(TAG, "percent2: "+(startMoist - moist) / startMoist);
+                    textViewPercent.setText(String.valueOf(percent));
+                }
+                if (startMoist > 4 && moist < 4) {
+                    sendNotification();
+                    Log.d(TAG, "건조완료, moist: " + moist);
+                    startMoist = 0;
+                    MyFirebase.startRef.setValue(false); //시스템 가동 중 아님
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
@@ -127,8 +253,6 @@ public class DryingActivity extends AppCompatActivity {
                 WeatherData weatherData = new WeatherData();
                 try {
                     weather = weatherData.lookUpWeather(date, time, x, y, weatherTextView, adviceTextView);
-//                            weather = weatherData.lookUpWeather("20210825", "0200", "60", "125");
-//                            weather = weatherData.lookUpWeather("20210825", "2300", "57", "128");
                     Log.d(TAG, weather);
                 } catch (JSONException e) {
                     Log.i("WEATHER_JSONERROR", e.getMessage());
@@ -143,55 +267,6 @@ public class DryingActivity extends AppCompatActivity {
             }
 
         });
-
-        String serverAdress = "";
-
-        ac_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String ac_status;
-                if (isChecked){
-                    ac_status = "acOn";
-                    Log.i("ac","acon");
-                } else {
-                    ac_status = "acOff";
-                    Log.i("ac","acoff");
-                }
-                HttpRequestTask requestTask = new HttpRequestTask(serverAdress);
-                requestTask.execute(ac_status);
-            }
-        });
-        curtain_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String curtain_status;
-                if (isChecked){
-                    curtain_status = "cOn";
-
-                } else {
-                    curtain_status = "cOff";
-                }
-                HttpRequestTask requestTask = new HttpRequestTask(serverAdress);
-                requestTask.execute(curtain_status);
-            }
-        });
-        window_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String window_status;
-                if (isChecked){
-                    window_status = "winOn";
-
-                } else {
-                    window_status = "winOff";
-
-                }
-                HttpRequestTask requestTask = new HttpRequestTask(serverAdress);
-                requestTask.execute(window_status);
-            }
-        });
-
 
     }
 
@@ -226,14 +301,6 @@ public class DryingActivity extends AppCompatActivity {
         }
         Log.i("격자값", "x = " + x + "  y = " + y);
     }
-
-
-    private String getTime(){
-        now = System.currentTimeMillis();
-        Date = new Date(now);
-        return mFormat.format(Date);
-    }
-
 
     // ActivityCompat.requestPermissions를 사용한 퍼미션 요청의 결과를 리턴받는 메소드입니다.
     @Override
@@ -374,16 +441,68 @@ public class DryingActivity extends AppCompatActivity {
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
+    String channelId = "one-channel";
+    String channelName = "My Channel One1";
+    String channelDescription = "My Channel One Description";
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+            channel.setDescription(channelDescription);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+    private void sendNotification() {
+        Intent intent = new Intent(this, DryingCompleteActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        intent.putExtra("AnotherActivity", TrueOrFalse);
+//        intent.putExtra("imageUri", imageUri);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+
+//        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, "one-channel")
+                .setSmallIcon(R.drawable.laundrydrying)
+//                .setSmallIcon(IconCompat.createWithBitmap(image))
+//                .setLargeIcon(image) //not work
+//                .setContentTitle(messageBody)
+                .setContentTitle("건조가 완료되었습니다")
+                .setContentText("건조완료")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                .setStyle(new NotificationCompat.BigPictureStyle()
+//                        .bigPicture(image))/*Notification with Image*/
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri)
+                .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(0, notificationBuilder.build());
+    }
 
     public static class HttpRequestTask extends AsyncTask<String, Void, String> {
-        private String serverAdress;
-        public HttpRequestTask(String serverAdress) {
-            this.serverAdress = serverAdress;
+        private String serverAddress = MyServer.serverAddress;
+        private String TAG = "HttpRequestTask";
+
+        public  HttpRequestTask(String serverAdress) {
+            this.serverAddress = serverAdress;
         }
+        public  HttpRequestTask( ) { }
         @Override
         protected String doInBackground(String... params) {
+            Log.d(TAG, "doInBackground호출");
+            Log.d(TAG, "serverAdress: " + serverAddress);
+
             String val = params[0];
-            final String url = "http://"+serverAdress + "/" + val;
+            final String url = "http://"+ serverAddress + "/" + val;
+            Log.d(TAG, "url: " + url);
 
             //okHttp 라이브러리를 사용한다.
             OkHttpClient client = new OkHttpClient();
@@ -392,9 +511,11 @@ public class DryingActivity extends AppCompatActivity {
                     .build();
             try {
                 Response response = client.newCall(request).execute();
-                //Log.d(TAG, response.body().string());
+                Log.d(TAG, "반응");
+                Log.d(TAG, String.valueOf(response));
+                Log.d(TAG, String.valueOf(response.body()));
                 return null;
-            } catch (IOException e) {
+            } catch (IOException e) { //이부분호출됨
                 e.printStackTrace();
             }
             return null;
@@ -412,5 +533,75 @@ public class DryingActivity extends AppCompatActivity {
 
 
     }
+
+    // 액티비티 나갔다오면 변수 초기화 되므로..
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MyFirebase.startMoistRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    Log.d(TAG, "startMoist: " + String.valueOf(task.getResult().getValue()));
+
+                    //파이어베이스에 값이 적어진 뒤 한참 후에 메소드가 호출되지만 그래도 ㄱㅊ은듯
+                    startMoist = (Long) task.getResult().getValue();
+//                    progressBar.setMax((int) startMoist);
+                }
+            });
+    }
 }
+
+
 /** END OF CODE **/
+//switch (v.getId()){
+//        case R.id.reset_button:
+
+//안쓰길래
+//private String getTime(){
+//    now = System.currentTimeMillis();
+//    Date = new Date(now);
+//    return mFormat.format(Date);
+//}
+
+//온체크드체인지리스너
+// ac_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+//@Override
+//public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//        String ac_status;
+//        if (isChecked){
+//        ac_status = "acOn";
+//        Log.i("ac","acon");
+//        } else {
+//        ac_status = "acOff";
+//        Log.i("ac","acoff");
+//        }
+//        HttpRequestTask requestTask = new HttpRequestTask();
+//        requestTask.execute(ac_status);
+//        }
+//        });
+//        curtain_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+//@Override
+//public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//        String curtain_status;
+//        if (isChecked){
+//        curtain_status = "cOn";
+//        } else {
+//        curtain_status = "cOff";
+//        }
+//        HttpRequestTask requestTask = new HttpRequestTask();
+//        requestTask.execute(curtain_status);
+//        }
+//        });
+//        window_button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+//@Override
+//public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//        String window_status;
+//        if (isChecked){
+//        window_status = "winOn";
+//        } else {
+//        window_status = "winOff";
+//        }
+//        HttpRequestTask requestTask = new HttpRequestTask();
+//        requestTask.execute(window_status);
+//        }
+//        });
