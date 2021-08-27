@@ -66,11 +66,8 @@ public class DryingActivity extends AppCompatActivity {
     SimpleDateFormat timeFormat = new SimpleDateFormat("HH00");     //HHmm이었던거 HH00으로 바꿈
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
-    TextView dateTextView, weatherTextView, adviceTextView, textViewPercent;
+    TextView dateTextView, weatherTextView, rainTextView, humidityTextView, adviceTextView, textViewPercent;
 
-    ToggleButton ac_button;
-    ToggleButton curtain_button;
-    ToggleButton window_button;
 
     private GPSTracker gpsTracker;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -99,7 +96,9 @@ public class DryingActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
 
         dateTextView = (TextView)findViewById(R.id.textViewTime);
-        weatherTextView = (TextView)findViewById(R.id.textViewWeather);
+        weatherTextView = (TextView)findViewById(R.id.weather);
+        rainTextView = (TextView)findViewById(R.id.rain);
+        humidityTextView = (TextView)findViewById(R.id.humidity);
         adviceTextView = (TextView)findViewById(R.id.textViewAdvice);
         textViewPercent = (TextView)findViewById(R.id.textViewPercent);
 
@@ -254,7 +253,7 @@ public class DryingActivity extends AppCompatActivity {
                 String weather = "";
                 WeatherData weatherData = new WeatherData();
                 try {
-                    weather = weatherData.lookUpWeather(date, time, x, y, weatherTextView, adviceTextView);
+                    weather = weatherData.lookUpWeather(date, time, x, y, weatherTextView,rainTextView, humidityTextView, adviceTextView);
                     Log.d(TAG, weather);
                 } catch (JSONException e) {
                     Log.i("WEATHER_JSONERROR", e.getMessage());

@@ -9,27 +9,137 @@
     android:orientation="vertical"
     android:gravity="center_horizontal |center_vertical">
 
+
     <TextView
         android:id="@+id/textViewTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_marginBottom="5dp"
         android:text="현재 시간" />
+
     <TextView
         android:id="@+id/textViewLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="17dp"
         android:text="위치" />
 
-    <TextView
-        android:id="@+id/textViewWeather"
-        android:layout_width="wrap_content"
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="현재 날씨: 흐림 강수확률: 30% 습도: 80%" />
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="13dp"
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/weathertext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:layout_marginTop="10dp"
+                android:textSize="15sp"
+                android:text="현재 날씨" />
+
+            <View style="@style/divider_style"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"/>
+
+            <TextView
+                android:id="@+id/weather"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textSize="17sp"
+                android:textAppearance="bold"
+                android:layout_marginTop="15dp"
+                android:text="흐림" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="15dp"
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/raintext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:layout_marginTop="10dp"
+                android:textSize="15sp"
+                android:text="강수확률" />
+
+            <View style="@style/divider_style"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"/>
+
+            <TextView
+                android:id="@+id/rain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textSize="17sp"
+                android:textAppearance="bold"
+                android:layout_marginTop="15dp"
+                android:text="20%" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginRight="17dp"
+            android:gravity="center_horizontal">
+            <TextView
+                android:id="@+id/humiditytext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:layout_marginTop="10dp"
+                android:textSize="15sp"
+                android:text="습도" />
+
+            <View style="@style/divider_style"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"/>
+
+            <TextView
+                android:id="@+id/humidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:textAlignment="center"
+                android:textSize="17sp"
+                android:textAppearance="bold"
+                android:text="40%" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
 
     <TextView
         android:id="@+id/textViewAdvice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="5dp"
+        android:textAlignment="center"
+        android:textSize="15sp"
         android:text="오늘은 흐리네요! 창문 열어도 괜찮을 것 같아요"/>
 
     <androidx.appcompat.widget.AppCompatButton
@@ -39,7 +149,7 @@
         android:background="@drawable/bg_round_stroke_thin"
         android:layout_marginTop="15dp"
         android:layout_marginBottom="15dp"
-        android:text="Reload" />
+        android:text="새로고침" />
 
     <View style="@style/divider_style"
         android:layout_marginTop="10dp"
@@ -63,6 +173,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAlignment="center"
                 android:text="에어컨"/>
 
         </LinearLayout>
@@ -79,6 +190,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textAlignment="center"
                     android:text="창문"/>
             </LinearLayout>
             <LinearLayout
@@ -94,6 +206,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textAlignment="center"
                     android:text="커튼"/>
             </LinearLayout>
     </LinearLayout>
@@ -112,6 +225,9 @@
             android:textSize="20sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:textAlignment="center"
             android:text="빨래 건조 진행률"/>
 
 

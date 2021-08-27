@@ -20,7 +20,7 @@ public class WeatherData {
     private String weather = "", rain = "", reh = "";
     private String TAG = "WeatherDatalog";
 
-    public String lookUpWeather(String baseDate, String time, String nx, String ny, TextView weatherTextView, TextView adviceTextView) throws IOException, JSONException {
+    public String lookUpWeather(String baseDate, String time, String nx, String ny, TextView weatherTextView, TextView rainTextView, TextView humidityTextView, TextView adviceTextView) throws IOException, JSONException {
 //        String baseDate = date;
         String baseTime = timeChange(time);
         String type = "json";
@@ -99,7 +99,7 @@ public class WeatherData {
                             weather = "현재 날씨: ";
                             if (fcstValue.equals("1")) {
                                 weather += "맑음 ";
-                                adviceTextView.setText("오늘은 맑네요! 창문/커튼을 활짝열어볼까요");
+                                adviceTextView.setText("오늘은 맑네요! 창문/커튼을 활짝열어볼까요!");
                             } else if (fcstValue.equals("2")) {
                                 weather += "비 ";
                                 adviceTextView.setText("오늘은 비가오네요! 창문/커튼을 닫고 에어컨켜는것을 추천드려요");
@@ -113,17 +113,19 @@ public class WeatherData {
                         }
 
                         if (category.equals("POP")) {
-                            rain = "강수확률 : " + fcstValue + "%";
+                            rain = fcstValue + "%";
                         }
 
                         if (category.equals("REH")) {
-                            reh = "습도 : " + fcstValue + "%";
+                            reh = fcstValue + "%";
                         }
 
                         Log.i("날씨", fcstValue);
                         Log.i("카테고리", category);
                         Log.i("현재날씨", weather+rain+reh);
-                        weatherTextView.setText(weather+rain+reh);
+                        weatherTextView.setText(weather);
+                        rainTextView.setText(rain);
+                        humidityTextView.setText(reh);
                     }
 
                 } catch (MalformedURLException e) {
