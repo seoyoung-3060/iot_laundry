@@ -115,6 +115,7 @@ void loop() {
       Serial.println("건조가 완료되었습니다");   //디버깅용
       if(!on) {
         buttonControl();
+        on = true;
       }
        //서보모터 제어 함수
       break;

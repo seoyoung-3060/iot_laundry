@@ -19,9 +19,15 @@
 
 //#define WIFI_SSID "SK_WiFiGIGA2B95"  
 //#define WIFI_PASSWORD "1603064717"  
+//
+//#define WIFI_SSID "twosome_DMC(2G)"
+//#define WIFI_PASSWORD "twosomedmc1!"
 
-#define WIFI_SSID "커피나무"  
-#define WIFI_PASSWORD "000012345a" 
+#define WIFI_SSID "winterz"
+#define WIFI_PASSWORD "201105166"
+
+//#define WIFI_SSID "커피나무"  
+//#define WIFI_PASSWORD "000012345a" 
 
 int MOISTPIN = A0;
 
@@ -76,7 +82,7 @@ void loop() {
   /** **/
 
  if (request.indexOf("/start") > 0){
-  digitalWrite(ledPin, HIGH);
+//  digitalWrite(ledPin, HIGH);
  }
 
   int startMoist = analogRead(MOISTPIN);
@@ -98,7 +104,7 @@ void loop() {
     Serial.println(moist); 
     
     // db에 값 적기 
-    Firebase.setFloat("moist", moist);  
+    Firebase.setInt("moist", moist);  
     // handle error  
     if (Firebase.failed()) {  
         Serial.print("setting /number failed:");  
@@ -110,6 +116,7 @@ void loop() {
     //건조 완료되면 프로그램 종료  
     if (Firebase.getFloat("moist") < 4) { 
       Serial.println("건조가 완료되었습니다");   //디버깅용
+      Firebase.setInt("startMoist", 0);  
       return;                         
     }
   }
