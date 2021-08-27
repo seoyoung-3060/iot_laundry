@@ -61,7 +61,7 @@ public class DryingActivity extends AppCompatActivity {
     //현재시간&날짜 가져오기
     long now; //ll
     Date Date;
-    SimpleDateFormat mFormat = new SimpleDateFormat("M월 dd일 HH시 mm분"); //dateFormat바꿈
+    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss"); //dateFormat바꿈
     //date와 time String으로 가져오기
     SimpleDateFormat timeFormat = new SimpleDateFormat("HH00");     //HHmm이었던거 HH00으로 바꿈
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");

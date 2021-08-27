@@ -11,36 +11,24 @@
 
     <TextView
         android:id="@+id/textViewTime"
-        android:textSize="20sp"
-        android:layout_margin="3dp"
-        android:gravity="center_horizontal"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="8월 26일 10시 56분" />
+        android:text="현재 시간" />
     <TextView
         android:id="@+id/textViewLocation"
-        android:textSize="17sp"
-        android:layout_margin="3dp"
-        android:gravity="center_horizontal"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="위치" />
 
     <TextView
         android:id="@+id/textViewWeather"
-        android:textSize="17sp"
-        android:layout_margin="3dp"
-        android:gravity="center_horizontal"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="현재 날씨: 흐림 강수확률: 30% 습도: 80%" />
 
     <TextView
         android:id="@+id/textViewAdvice"
-        android:layout_margin="3dp"
-        android:textSize="17sp"
-        android:gravity="center_horizontal"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="오늘은 흐리네요! 창문 열어도 괜찮을 것 같아요"/>
 
@@ -48,7 +36,6 @@
         android:id="@+id/reset_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:foreground="?android:attr/selectableItemBackgroundBorderless"
         android:background="@drawable/bg_round_stroke_thin"
         android:layout_marginTop="15dp"
         android:layout_marginBottom="15dp"
