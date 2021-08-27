@@ -275,7 +275,7 @@ public class DryingActivity extends AppCompatActivity {
                 String weather = "";
                 WeatherData weatherData = new WeatherData();
                 try {
-                    weather = weatherData.lookUpWeather(date, time, x, y, weatherTextView,rainTextView, humidityTextView, adviceTextView, getApplicationContext());
+                    weather = weatherData.lookUpWeather(date, time, x, y, weatherTextView,rainTextView, humidityTextView, adviceTextView, getApplicationContext(), DryingActivity.this);
                     Log.d(TAG, weather);
                 } catch (JSONException e) {
                     Log.i("WEATHER_JSONERROR", e.getMessage());

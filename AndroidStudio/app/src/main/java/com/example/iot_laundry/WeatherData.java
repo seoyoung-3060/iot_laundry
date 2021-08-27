@@ -2,6 +2,8 @@ package com.example.iot_laundry;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -23,7 +25,7 @@ public class WeatherData {
     private String weather = "", rain = "", reh = "";
     private String TAG = "WeatherDatalog";
 
-    public String lookUpWeather(String baseDate, String time, String nx, String ny, TextView weatherTextView, TextView rainTextView, TextView humidityTextView, TextView adviceTextView, Context context) throws IOException, JSONException {
+    public String lookUpWeather(String baseDate, String time, String nx, String ny, TextView weatherTextView, TextView rainTextView, TextView humidityTextView, TextView adviceTextView, Context context, Activity activity) throws IOException, JSONException {
 //        String baseDate = date;
         String baseTime = timeChange(time);
         String type = "json";
@@ -130,16 +132,32 @@ public class WeatherData {
 //                        weatherTextView.setText(weather);
 //                        rainTextView.setText(rain);
 //                        humidityTextView.setText(reh);
+//                        ((Activity) context).runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                weatherTextView.setText(weather);
+//                                rainTextView.setText(rain);
+//                                humidityTextView.setText(reh);
+//                            }
+//                        });
+
+//                        activity.runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                weatherTextView.setText(weather);
+//                                rainTextView.setText(rain);
+//                                humidityTextView.setText(reh);
+//                            }
+//                        });
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            public void run() {
+                                weatherTextView.setText("Hello!! Android Team :-) From child thread.");
+                            }
+                        });
+//                    }
                     }
 
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            weatherTextView.setText(weather);
-                            rainTextView.setText(rain);
-                            humidityTextView.setText(reh);
-                        }
-                    });
+
 
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
