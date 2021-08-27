@@ -1,13 +1,18 @@
 package com.example.iot_laundry;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.ColorStateList;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -20,7 +25,10 @@ import android.widget.Toast;
 
 import com.example.iot_laundry.Utils.MyServer;
 import com.example.iot_laundry.firebase.MyFirebase;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.database.DataSnapshot;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -49,8 +57,31 @@ public class MainActivity extends AppCompatActivity {
 
                 String activityState = "start";
 //                DryingActivity.HttpRequestTask httpRequestTask = new DryingActivity.HttpRequestTask();
-                DryingActivity.HttpRequestTask requestTask = new DryingActivity.HttpRequestTask();
+                DryingActivity.HttpRequestTask requestTask = new DryingActivity.HttpRequestTask(MyServer.moistAddress);
                 requestTask.execute(activityState);
+            }
+        });
+
+        MyFirebase.startMoistRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                }
+                else {
+                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                    long startMoist = (Long) task.getResult().getValue();
+                    if (startMoist != 0) {
+                        buttonStart.setText("진행 중");
+                        buttonStart.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.navigation_color_4));
+                        buttonStart.setEnabled(true);
+
+                    } else {
+                        buttonStart.setText("시작");
+                        buttonStart.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.progress_blue));
+
+                    }
+                }
             }
         });
 

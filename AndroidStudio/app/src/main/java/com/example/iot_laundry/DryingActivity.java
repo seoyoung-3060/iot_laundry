@@ -124,7 +124,7 @@ public class DryingActivity extends AppCompatActivity {
                     ac_status = "acOff";
                 }
                 Log.i("ac", ac_status);
-                HttpRequestTask requestTask = new HttpRequestTask();
+                HttpRequestTask requestTask = new HttpRequestTask(MyServer.buttonAddress);
                 requestTask.execute(ac_status);
             }
         });
@@ -140,7 +140,7 @@ public class DryingActivity extends AppCompatActivity {
                 } else {
                     curtain_status = "curtOff";
                 }
-                HttpRequestTask requestTask = new HttpRequestTask();
+                HttpRequestTask requestTask = new HttpRequestTask(MyServer.curtainAddress);
                 requestTask.execute(curtain_status);
             }
         });
@@ -156,7 +156,7 @@ public class DryingActivity extends AppCompatActivity {
                 } else {
                     window_status = "winOff";
                 }
-                HttpRequestTask requestTask = new HttpRequestTask();
+                HttpRequestTask requestTask = new HttpRequestTask(MyServer.windowAddress);
                 requestTask.execute(window_status);
             }
         });
@@ -186,7 +186,7 @@ public class DryingActivity extends AppCompatActivity {
                 Log.d(TAG, "moist: "+moist);
                 Log.d(TAG, "startMoist: "+startMoist);
 
-                if (startMoist > 4) {
+                if (startMoist != 0) {
                     progressBar.setProgress((int) (startMoist - moist));
                     Log.d(TAG, String.valueOf(startMoist - moist));
                     double percent = Math.round(((double) (startMoist - moist) / (double) startMoist) * 100);
@@ -199,6 +199,8 @@ public class DryingActivity extends AppCompatActivity {
                     Log.d(TAG, "건조완료, moist: " + moist);
                     startMoist = 0;
                     MyFirebase.startRef.setValue(false); //시스템 가동 중 아님
+                    textViewPercent.setText("100");
+                    progressBar.setProgress((int) startMoist);
                 }
             }
             @Override
@@ -489,7 +491,7 @@ public class DryingActivity extends AppCompatActivity {
     }
 
     public static class HttpRequestTask extends AsyncTask<String, Void, String> {
-        private String serverAddress = MyServer.serverAddress;
+        private String serverAddress;// = MyServer.serverAddress;
         private String TAG = "HttpRequestTask";
 
         public  HttpRequestTask(String serverAdress) {
