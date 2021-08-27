@@ -1,5 +1,7 @@
 package com.example.iot_laundry;
 
+import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -15,12 +17,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Date;
 
 public class WeatherData {
     private String weather = "", rain = "", reh = "";
     private String TAG = "WeatherDatalog";
 
-    public String lookUpWeather(String baseDate, String time, String nx, String ny, TextView weatherTextView, TextView rainTextView, TextView humidityTextView, TextView adviceTextView) throws IOException, JSONException {
+    public String lookUpWeather(String baseDate, String time, String nx, String ny, TextView weatherTextView, TextView rainTextView, TextView humidityTextView, TextView adviceTextView, Context context) throws IOException, JSONException {
 //        String baseDate = date;
         String baseTime = timeChange(time);
         String type = "json";
@@ -123,10 +126,20 @@ public class WeatherData {
                         Log.i("날씨", fcstValue);
                         Log.i("카테고리", category);
                         Log.i("현재날씨", weather+rain+reh);
-                        weatherTextView.setText(weather);
-                        rainTextView.setText(rain);
-                        humidityTextView.setText(reh);
+
+//                        weatherTextView.setText(weather);
+//                        rainTextView.setText(rain);
+//                        humidityTextView.setText(reh);
                     }
+
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            weatherTextView.setText(weather);
+                            rainTextView.setText(rain);
+                            humidityTextView.setText(reh);
+                        }
+                    });
 
                 } catch (MalformedURLException e) {
                     e.printStackTrace();

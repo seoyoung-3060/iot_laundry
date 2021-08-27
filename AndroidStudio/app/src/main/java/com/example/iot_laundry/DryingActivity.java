@@ -46,6 +46,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -61,7 +62,7 @@ public class DryingActivity extends AppCompatActivity {
     //현재시간&날짜 가져오기
     long now; //ll
     Date Date;
-    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss"); //dateFormat바꿈
+//    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss"); //dateFormat바꿈
     //date와 time String으로 가져오기
     SimpleDateFormat timeFormat = new SimpleDateFormat("HH00");     //HHmm이었던거 HH00으로 바꿈
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -81,7 +82,7 @@ public class DryingActivity extends AppCompatActivity {
     private String TAG = "DryingActivityLog";
 
     ToggleButton toggleAC, toggleCurtain, toggleWindow;
-//    ToggleButton[] toggleButtonList = {toggleAC, toggleCurtain, toggleWindow};
+    ToggleButton[] toggleButtonList;
 
     ProgressBar progressBar;
 
@@ -91,6 +92,8 @@ public class DryingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drying);
+
+        showCurrentTime();
 
         //init view
         progressBar = findViewById(R.id.progressBar);
@@ -105,6 +108,8 @@ public class DryingActivity extends AppCompatActivity {
         toggleAC = findViewById(R.id.toggleAC);
         toggleCurtain = findViewById(R.id.toggleCurtain);
         toggleWindow = findViewById(R.id.toggleWindow);
+
+        toggleButtonList = new ToggleButton[]{toggleAC, toggleCurtain, toggleWindow};
 
         createNotificationChannel();
 //        sendNotification();
@@ -168,6 +173,18 @@ public class DryingActivity extends AppCompatActivity {
                 if (startMoist > 4) {
                     progressBar.setMax((int)startMoist);
                 }
+
+                boolean bool;
+                if (startMoist == 0) {
+                    bool = true;
+                } else bool = false;
+
+
+                for (ToggleButton tb: toggleButtonList) {
+                    tb.setChecked(bool);
+                }
+
+
             }
             @Override
             public void onCancelled(@NonNull  DatabaseError error) {
@@ -185,7 +202,7 @@ public class DryingActivity extends AppCompatActivity {
                 Log.d(TAG, "moist: "+moist);
                 Log.d(TAG, "startMoist: "+startMoist);
 
-                if (startMoist != 0) {
+                if (startMoist != 0 && (startMoist > moist) ) {
                     progressBar.setProgress((int) (startMoist - moist));
                     Log.d(TAG, String.valueOf(startMoist - moist));
                     double percent = Math.round(((double) (startMoist - moist) / (double) startMoist) * 100);
@@ -193,6 +210,7 @@ public class DryingActivity extends AppCompatActivity {
                     Log.d(TAG, "percent2: "+(startMoist - moist) / startMoist);
                     textViewPercent.setText(String.valueOf(percent));
                 }
+                //건조완료 시
                 if (startMoist > 4 && moist < 4) {
                     sendNotification();
                     Log.d(TAG, "건조완료, moist: " + moist);
@@ -200,6 +218,14 @@ public class DryingActivity extends AppCompatActivity {
                     MyFirebase.startRef.setValue(false); //시스템 가동 중 아님
                     textViewPercent.setText("100");
                     progressBar.setProgress((int) startMoist);
+
+                    //건조 완료 시 http
+                    HttpRequestTask requestTask1 = new HttpRequestTask(MyServer.buttonAddress);
+                    requestTask1.execute("acOn");
+                    HttpRequestTask requestTask2 = new HttpRequestTask(MyServer.curtainAddress);
+                    requestTask2.execute("curtOn");
+                    HttpRequestTask requestTask3 = new HttpRequestTask(MyServer.windowAddress);
+                    requestTask3.execute("winOn");
                 }
             }
             @Override
@@ -224,13 +250,9 @@ public class DryingActivity extends AppCompatActivity {
                 now = System.currentTimeMillis(); //현재 시간 가져오기
                 Date = new Date(now);             //Date 생성하기
 
-                total_date = mFormat.format(Date);
-                dateTextView.setText(total_date);
-
                 time = timeFormat.format(Date);
                 date = dateFormat.format(Date);
 
-                Log.i("total_date",total_date);
                 Log.i("time",time);
                 Log.i("date",date);
 
@@ -253,7 +275,7 @@ public class DryingActivity extends AppCompatActivity {
                 String weather = "";
                 WeatherData weatherData = new WeatherData();
                 try {
-                    weather = weatherData.lookUpWeather(date, time, x, y, weatherTextView,rainTextView, humidityTextView, adviceTextView);
+                    weather = weatherData.lookUpWeather(date, time, x, y, weatherTextView,rainTextView, humidityTextView, adviceTextView, getApplicationContext());
                     Log.d(TAG, weather);
                 } catch (JSONException e) {
                     Log.i("WEATHER_JSONERROR", e.getMessage());
@@ -551,6 +573,48 @@ public class DryingActivity extends AppCompatActivity {
                 }
             });
     }
+
+    private void showCurrentTime() {
+        dateTextView = (TextView)findViewById(R.id.textViewTime);
+        SimpleDateFormat mFormat = new SimpleDateFormat("M월 d일 H시 mm분"); //dateFormat바꿈
+//        timeText =  findViewById(R.id.textView_time);
+        new Thread(new Runnable() { //실시간으로 시계출력하기 위한 thread
+            @Override
+            public void run() {
+
+                while (true) {
+                    try {
+                        runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+
+                                now = System.currentTimeMillis(); //현재 시간 가져오기
+                                Date = new Date(now);             //Date 생성하기
+
+                                String total_date = mFormat.format(Date);
+                                dateTextView.setText(total_date);
+
+
+                            }
+                        });
+
+//                        Calendar calendar = Calendar.getInstance();
+//                        dateTextView.setText("오전 " + calendar.get(Calendar.HOUR_OF_DAY) + "시 " + calendar.get(Calendar.MINUTE) + "분 " + calendar.get(Calendar.SECOND) + "초");
+
+//                        now = System.currentTimeMillis(); //현재 시간 가져오기
+//                        Date = new Date(now);             //Date 생성하기
+//
+//                        String total_date = mFormat.format(Date);
+//                        dateTextView.setText(total_date);
+//
+                        Thread.sleep(60000); //1분
+                    } catch (InterruptedException ex) {}
+                }
+            }
+        }).start(); // 실시간으로 시계 출력
+    }
+
 }
 
 

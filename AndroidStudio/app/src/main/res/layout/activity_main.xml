@@ -33,6 +33,8 @@
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:text="시작"
+        android:backgroundTint="@color/progress_blue"
+        android:textColor="@color/white"
         android:layout_margin="20dp"
         android:textSize="30sp"/>
 

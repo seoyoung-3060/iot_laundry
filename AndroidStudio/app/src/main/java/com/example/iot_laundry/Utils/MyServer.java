@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 
 public class MyServer {
 //    public static String serverAddress;// = "192.168.35.237";
-    public static String moistAddress = "192.168.126.28";
+    public static String moistAddress = "192.168.35.42";
 
     public static String buttonAddress = "192.168.35.242";
     public static String curtainAddress = "192.168.35.86";
