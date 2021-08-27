@@ -181,7 +181,7 @@ public class DryingActivity extends AppCompatActivity {
 
 
                 for (ToggleButton tb: toggleButtonList) {
-                    tb.setChecked(bool);
+                    tb.setChecked(false);
                 }
 
 
