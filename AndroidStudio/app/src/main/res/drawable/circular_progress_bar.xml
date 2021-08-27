@@ -10,7 +10,7 @@
 
         <gradient
             android:angle="0"
-            android:endColor="@color/design_default_color_primary_dark"
+            android:endColor="@color/progress_blue"
             android:startColor="@color/progress_blue"
             android:type="sweep"
             android:useLevel="false" />
