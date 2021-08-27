@@ -1,9 +1,5 @@
 # iot_laundry
 
-[Arduino]
--빨래건조대&에어컨조절&창문조절 세개로 나눠서 코드작성
--firebase 기반 코드 작성완료(와이파이모듈로 확인필요)
+[Arduino] - 3개의 NodeMCU를 이용해 firebase&AndroidApp과 연동하여 모듈제어(서보모터, 스텝모터, 수분센서)
 
-[Android Studio]
--firebase 연결 (예정)
--날씨 오류 진행중
+[Android Studio] - Firebase: button_state제공 및 사용자에게 건조상태 제공 Arduino: 버튼사용자화하여 제어
