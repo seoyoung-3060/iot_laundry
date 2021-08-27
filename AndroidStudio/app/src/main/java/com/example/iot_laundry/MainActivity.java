@@ -20,13 +20,14 @@ import android.widget.Toast;
 
 import com.example.iot_laundry.Utils.MyServer;
 import com.example.iot_laundry.firebase.MyFirebase;
+import com.google.android.material.button.MaterialButton;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class MainActivity extends AppCompatActivity {
     private String TAG = "MainActivityLog";
-    Button buttonStart;
+    MaterialButton buttonStart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

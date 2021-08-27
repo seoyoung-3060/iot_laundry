@@ -7,4 +7,60 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="progress_blue">#6799FF</color>
+
+    <color name="red">#FF0000</color>
+
+    <color name="grey">#717171</color>
+    <color name="light_grey">#E3E3E3</color>
+    <color name="very_light_grey">#F3F6F0</color>
+    <color name="green_BG">#ffc3cabd</color>
+    <color name="green_frost_BG">#E3F4F0</color>
+    <color name="green_ocean_text">#2D6556</color>
+    <color name="green_fern_icon">#63B68E</color>
+
+    <color name="bg_checked">#DEE3BF</color>
+    <color name="bg_unchecked">#A8A8A8</color>
+    <color name="divider">#BDBDBD</color>
+    <color name="transparent">#00BDBDBD</color>
+    <color name="main_theme">#8BC34A</color>
+    <color name="blue_grey">#aabbcc</color>
+
+    <color name="tiny_circle_green">#98c060</color>
+
+    <color name="물주기">#aabbcc</color>
+    <color name="비료주기">#D5FFBE</color>
+    <color name="분갈이">#917369</color>
+
+
+    <color name="bg_lightyellow">#fdfcfa</color>
+    <color name="tc_lightgrey">#bdbdbc</color>
+    <color name="bg_pointgrey">#f2f1ed</color>
+    <color name="bg_lightgrey">#fafafa</color>
+
+
+
+    <!--식물상세이지.백과사전,돋보기,나의정원,페이보릿 순-->
+    <color name="bg_plant_detail">#f4f5f9</color>
+    <!--bottom navigation bar-->
+    <!--    <color name="home">#2196F3</color>-->
+    <!--    <color name="activity">#673AB7</color>-->
+    <!--    <color name="favorites">#E91E63</color>-->
+    <!--    <color name="settings">#4CAF50</color>-->
+    <color name="navigation_color_1">#8D3DFF</color>
+    <color name="navigation_color_2">#E6A919</color>
+    <color name="navigation_color_3">#4CAF50</color>
+    <color name="navigation_color_4">#E91E63</color>
+
+    <!--    <color name="navigation_color_1">#6200EE</color>-->
+    <!--    <color name="navigation_color_2">#C9379D</color>-->
+    <!--    <color name="navigation_color_3">#E6A919</color>-->
+    <!--    <color name="navigation_color_4">#008577</color>-->
+    <!--    <color name="navigation_color_5">#1194AA</color>-->
+
+
+
+
+
 </resources>
