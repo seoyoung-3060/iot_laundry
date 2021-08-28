@@ -220,12 +220,14 @@ public class DryingActivity extends AppCompatActivity {
                     progressBar.setProgress((int) startMoist);
 
                     //건조 완료 시 http
-                    HttpRequestTask requestTask1 = new HttpRequestTask(MyServer.buttonAddress);
-                    requestTask1.execute("acOn");
                     HttpRequestTask requestTask2 = new HttpRequestTask(MyServer.curtainAddress);
                     requestTask2.execute("curtOn");
                     HttpRequestTask requestTask3 = new HttpRequestTask(MyServer.windowAddress);
                     requestTask3.execute("winOn");
+                    HttpRequestTask requestTask1 = new HttpRequestTask(MyServer.buttonAddress);
+                    requestTask1.execute("acOn");
+
+
                 }
             }
             @Override
@@ -275,7 +277,7 @@ public class DryingActivity extends AppCompatActivity {
                 String weather = "";
                 WeatherData weatherData = new WeatherData();
                 try {
-                    weather = weatherData.lookUpWeather(date, time, x, y, weatherTextView,rainTextView, humidityTextView, adviceTextView, getApplicationContext(), DryingActivity.this);
+                    weather = weatherData.lookUpWeather(date, time, x, y, DryingActivity.this);
                     Log.d(TAG, weather);
                 } catch (JSONException e) {
                     Log.i("WEATHER_JSONERROR", e.getMessage());

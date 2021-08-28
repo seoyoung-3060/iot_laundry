@@ -22,13 +22,15 @@ import java.net.URLEncoder;
 import java.util.Date;
 
 public class WeatherData {
-    private String weather = "", rain = "", reh = "";
+    private String weather = "", rain = "", reh = "", advice = "";
     private String TAG = "WeatherDatalog";
+    private DryingActivity dryingActivity;
 
-    public String lookUpWeather(String baseDate, String time, String nx, String ny, TextView weatherTextView, TextView rainTextView, TextView humidityTextView, TextView adviceTextView, Context context, Activity activity) throws IOException, JSONException {
+    public String lookUpWeather(String baseDate, String time, String nx, String ny, DryingActivity activity) throws IOException, JSONException {
 //        String baseDate = date;
         String baseTime = timeChange(time);
         String type = "json";
+        this.dryingActivity = activity;
 
         Log.i(TAG,"time: " + time);
         Log.i(TAG,"baseDate: " + baseDate);
@@ -100,20 +102,20 @@ public class WeatherData {
                         String fcstValue = jsonObj_4.getString("fcstValue");
                         String category = jsonObj_4.getString("category");
 
+
                         if (category.equals("SKY")) {
-                            weather = "현재 날씨: ";
                             if (fcstValue.equals("1")) {
-                                weather += "맑음 ";
-                                adviceTextView.setText("오늘은 맑네요! 창문/커튼을 활짝열어볼까요!");
+                                weather = "맑음 ";
+                                advice = "오늘은 맑네요! 창문/커튼을 활짝열어볼까요!";
                             } else if (fcstValue.equals("2")) {
-                                weather += "비 ";
-                                adviceTextView.setText("오늘은 비가오네요! 창문/커튼을 닫고 에어컨켜는것을 추천드려요");
+                                weather = "비 ";
+                                advice = "오늘은 비가오네요! 창문/커튼을 닫고 에어컨켜는것을 추천드려요";
                             } else if (fcstValue.equals("3")) {
-                                weather += "구름많음 ";
-                                adviceTextView.setText("오늘은 구름이 많네요! 창문열어도 괜찮을것같아요");
+                                weather = "구름많음 ";
+                                advice = "오늘은 구름이 많네요! 창문열어도 괜찮을것같아요";
                             } else if (fcstValue.equals("4")) {
-                                weather += "흐림 ";
-                                adviceTextView.setText("오늘은 흐리네요! 창문열어도 괜찮을것같아요");
+                                weather = "흐림 ";
+                                advice = "오늘은 흐리네요! 창문열어도 괜찮을것같아요";
                             }
                         }
 
@@ -129,32 +131,15 @@ public class WeatherData {
                         Log.i("카테고리", category);
                         Log.i("현재날씨", weather+rain+reh);
 
-//                        weatherTextView.setText(weather);
-//                        rainTextView.setText(rain);
-//                        humidityTextView.setText(reh);
-//                        ((Activity) context).runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                weatherTextView.setText(weather);
-//                                rainTextView.setText(rain);
-//                                humidityTextView.setText(reh);
-//                            }
-//                        });
-
-//                        activity.runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                weatherTextView.setText(weather);
-//                                rainTextView.setText(rain);
-//                                humidityTextView.setText(reh);
-//                            }
-//                        });
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        dryingActivity.runOnUiThread(new Runnable() {
+                            @Override
                             public void run() {
-                                weatherTextView.setText("Hello!! Android Team :-) From child thread.");
+                                dryingActivity.adviceTextView.setText(advice);
+                                dryingActivity.weatherTextView.setText(weather);
+                                dryingActivity.rainTextView.setText(rain);
+                                dryingActivity.humidityTextView.setText(reh);
                             }
                         });
-//                    }
                     }
 
 

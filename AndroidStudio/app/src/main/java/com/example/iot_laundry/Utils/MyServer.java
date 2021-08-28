@@ -7,9 +7,9 @@ public class MyServer {
 //    public static String serverAddress;// = "192.168.35.237";
     public static String moistAddress = "192.168.35.42";
 
-    public static String buttonAddress = "192.168.35.242";
-    public static String curtainAddress = "192.168.35.86";
-    public static String windowAddress = "192.168.35.158";
+    public static String buttonAddress = "192.168.35.93";
+    public static String curtainAddress = "192.168.35.93";
+    public static String windowAddress = "192.168.35.93";
 
 //    public void setServerAddress(String serverAddress) {
 //        this.serverAddress = serverAddress;
