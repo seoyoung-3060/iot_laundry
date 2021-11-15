@@ -16,11 +16,10 @@
 #define FIREBASE_HOST "iot-laundry02-default-rtdb.firebaseio.com"
 #define FIREBASE_AUTH "qlNCOwAypMDI1bjWPus5Szvs32lTDu1EDkRqEqiy"
 
-#define WIFI_SSID "SK_WiFiGIGA2B95"
-#define WIFI_PASSWORD "1603064717"
-
-//#define WIFI_SSID "커피나무"
-//#define WIFI_PASSWORD "000012345a"
+//#define WIFI_SSID "SK_WiFiGIGA2B95"
+//#define WIFI_PASSWORD "1603064717"
+#define WIFI_SSID "KT_GiGA_2G_sumin"
+#define WIFI_PASSWORD "sumin78900"
 
 WiFiServer server(80); //추가
 
@@ -36,6 +35,10 @@ void setup() {
   myservo.attach(SERVOPIN);
 
   // connect to wifi.
+  IPAddress ip(172, 30, 1, 100); // 사용할 IP 주소
+  IPAddress gateway(172, 30, 1, 254); // 게이트웨이 주소
+  IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
+  WiFi.config(ip, gateway, subnet); // before or after Wifi.Begin(ssid, password);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("connecting");
   while (WiFi.status() != WL_CONNECTED) {
@@ -108,8 +111,8 @@ void loop() {
   /** 클라이언트(앱) 처리. 연결 안됐으면 return; **/
   clientcall();
   while (true) {
-    Serial.println("건조 완료까지 대기중");   //디버깅용
-    clientcall();
+    Serial.print("건조완료대기중 ");
+    Serial.println(WiFi.localIP());    clientcall();
     /** 클라이언트(앱) 과 연결 됐다면, **/
     if (Firebase.getInt("moist") < 4) {
       Serial.println("건조가 완료되었습니다");   //디버깅용
@@ -120,46 +123,9 @@ void loop() {
        //서보모터 제어 함수
       break;
     }
-
     delay(2000); //테스트용, 2초 마다 파이어베이스의 moist값 읽음
     //    delay(500000); //시현용, 5분
   }
   //}
 
-  //  /** 클라이언트(앱) 처리. 연결 안됐으면 return; **/
-  //  Serial.println("요청 기다리는 중");
-  //  WiFiClient client = server.available();
-  //  if (!client) {
-  //    return;
-  //  }
-  //  Serial.println("앱으로부터 연결 완료, 건조 시스템 시작");
-  //  while (!client.available()) {
-  //    delay(1);
-  //  }
-  //  String request = client.readStringUntil('\r');
-  //  Serial.println(request);
-  //  client.flush();
-  //
-  //  while (true) {
-  //     Serial.println("건조 완료까지 대기중");   //디버깅용
-  //
-  //    /** 클라이언트(앱) 과 연결 됐다면, **/
-  //    if (Firebase.getInt("moist") < 4) {
-  //      Serial.println("건조가 완료되었습니다");   //디버깅용
-  //      buttonControl(); //서보모터 제어 함수
-  //      return;
-  //    } else if (request.indexOf("/acOn") > 0) {
-  //      Serial.println("acOn호출");   //디버깅용
-  //      buttonControl();
-  //    }
-  //    else if (request.indexOf("/acOff") > 0) {
-  //      Serial.println("acOff호출");   //디버깅용
-  //      buttonControl();
-  //    }
-  //    else {
-  //
-  //    }
-  //    delay(2000); //테스트용, 2초 마다 파이어베이스의 moist값 읽음
-  //      //    delay(500000); //시현용, 5분
-  //  }
 }
