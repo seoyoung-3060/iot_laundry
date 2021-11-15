@@ -18,38 +18,32 @@
 //
 //#define WIFI_SSID "SK_WiFiGIGA2B95"
 //#define WIFI_PASSWORD "1603064717"
-//
-//#define WIFI_SSID "twosome_DMC(5G)"
-//#define WIFI_PASSWORD "twosomedmc1!"
-
-#define WIFI_SSID "winterz"
-#define WIFI_PASSWORD "201105166"
-
-//#define WIFI_SSID "김상경의 iPhone"
-//#define WIFI_PASSWORD "113333555555"
+//#define WIFI_SSID "winterz"
+//#define WIFI_PASSWORD "201105166"
+#define WIFI_SSID "KT_GiGA_2G_sumin"
+#define WIFI_PASSWORD "sumin78900"
 
 WiFiServer server(80); //추가
 
-////stepmotor 02
-//int IN1 = 4;                      // IN1핀을 8번에 배선합니다.
-//int IN2 = 5;                      // IN2핀을 9번에 배선합니다.
-//int IN3 = 6;                    // IN3핀을 10번에 배선합니다.
-//int IN4 = 7;                    // IN4핀을 11번에 배선합니다.
-////stepmotor 01
-//int IN5 = 8;                      // IN1핀을 8번에 배선합니다.
-//int IN6 = 9;                      // IN2핀을 9번에 배선합니다.
-//int IN7 = 10;                    // IN3핀을 10번에 배선합니다.
-//int IN8 = 11;                    // IN4핀을 11번에 배선합니다.
-//4
-//14
-//12
-//13
+//위모스 D1용 stepmotor 02
+int IN5 = D2;                      // IN1핀을 8번에 배선합니다.
+int IN6 = D3;                      // IN2핀을 9번에 배선합니다.
+int IN7 = D4;                    // IN3핀을 10번에 배선합니다.
+int IN8 = D5;                    // IN4핀을 11번에 배선합니다.
 
 //stepmotor 01
-int IN5 = 4;                      // IN1핀을 8번에 배선합니다.
-int IN6 = 14;                      // IN2핀을 9번에 배선합니다.
-int IN7 = 12;                    // IN3핀을 10번에 배선합니다.
-int IN8 = 13;                    // IN4핀을 11번에 배선합니다.
+//int IN5 = 5;                      // IN1핀을 8번에 배선합니다.
+//int IN6 = 4;                      // IN2핀을 9번에 배선합니다.
+//int IN7 = 0;                    // IN3핀을 10번에 배선합니다.
+//int IN8 = 2;                    // IN4핀을 11번에 배선합니다.
+////D1,2,3,4 순서 
+
+////stepmotor 01
+//int IN5 = 4;                      // IN1핀을 8번에 배선합니다.
+//int IN6 = 0;                      // IN2핀을 9번에 배선합니다.
+//int IN7 = 2;                    // IN3핀을 10번에 배선합니다.
+//int IN8 = 14;                    // IN4핀을 11번에 배선합니다.
+
 
 int motorSpeed = 1200;     // 스텝모터의 속도를 정할 수 있습니다.
 // 스텝을 카운트하여 얼마나 회전했는지 확인할 수 있습니다.
@@ -97,10 +91,9 @@ void curtainclose() {
   for (int i = 0; i < 3; i++) {
     int count = 0;
     while (count < countsperrev ) {                 // count가 countsperrev 보다 작으면
-        
-      
-      Serial.println(count);
-      Serial.println(countsperrev);
+      yield(); //Soft WDT reset 에러 없애기 위해 추가
+      Serial.print("countsperrev, count: ");
+      Serial.println((String) countsperrev + ", " + count);
       clockwise();
       count++;// clockwise()함수를 실행합니다.
     }
@@ -113,8 +106,9 @@ void curtainopen() {
       int count = 0;
 
     while (count < countsperrev ) {                 // count가 countsperrev 보다 작으면
-      Serial.println(count);
-      Serial.println(countsperrev);
+      yield(); //Soft WDT reset 에러 없애기 위해 추가
+      Serial.print("countsperrev, count: ");
+      Serial.println((String) countsperrev + ", " + count);
       clockwise();
       count++;// anticlockwise()함수를 실행합니다.
     }
@@ -146,7 +140,8 @@ void clientcall() {
 void loop() {
   clientcall();
   while (true) {
-    Serial.println("건조완료대기중");
+    Serial.print("건조완료대기중 ");
+    Serial.println(WiFi.localIP());
     clientcall();
     if (Firebase.getInt("moist") < 4) {
     Serial.println("건조완료");

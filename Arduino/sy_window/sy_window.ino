@@ -18,8 +18,10 @@
 
 //#define WIFI_SSID "SK_WiFiGIGA2B95"
 //#define WIFI_PASSWORD "1603064717"
-#define WIFI_SSID "winterz"
-#define WIFI_PASSWORD "201105166"
+//#define WIFI_SSID "winterz"
+//#define WIFI_PASSWORD "201105166"
+#define WIFI_SSID "KT_GiGA_2G_sumin"
+#define WIFI_PASSWORD "sumin78900"
 
 WiFiServer server(80); //추가
 
@@ -28,16 +30,12 @@ WiFiServer server(80); //추가
 //int IN2 = 5;                      // IN2핀을 9번에 배선합니다.
 //int IN3 = 6;                    // IN3핀을 10번에 배선합니다.
 //int IN4 = 7;                    // IN4핀을 11번에 배선합니다.
-////stepmotor 01
-//int IN5 = 8;                      // IN1핀을 8번에 배선합니다.
-//int IN6 = 9;                      // IN2핀을 9번에 배선합니다.
-//int IN7 = 10;                    // IN3핀을 10번에 배선합니다.
-//int IN8 = 11;                    // IN4핀을 11번에 배선합니다.
+
 //stepmotor 01
-int IN5 = 5;                      // IN1핀을 8번에 배선합니다.
-int IN6 = 4;                      // IN2핀을 9번에 배선합니다.
-int IN7 = 0;                    // IN3핀을 10번에 배선합니다.
-int IN8 = 2;                    // IN4핀을 11번에 배선합니다.
+int IN5 = D8;                      // IN1핀을 8번에 배선합니다.
+int IN6 = D9;                      // IN2핀을 9번에 배선합니다.
+int IN7 = D10;                    // IN3핀을 10번에 배선합니다.
+int IN8 = D11;                    // IN4핀을 11번에 배선합니다.
 
 int motorSpeed = 1200;     // 스텝모터의 속도를 정할 수 있습니다.
 // 스텝을 카운트하여 얼마나 회전했는지 확인할 수 있습니다.
