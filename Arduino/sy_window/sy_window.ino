@@ -30,7 +30,6 @@ WiFiServer server(80); //추가
 //int IN2 = 5;                      // IN2핀을 9번에 배선합니다.
 //int IN3 = 6;                    // IN3핀을 10번에 배선합니다.
 //int IN4 = 7;                    // IN4핀을 11번에 배선합니다.
-
 //stepmotor 01
 int IN5 = D8;                      // IN1핀을 8번에 배선합니다.
 int IN6 = D9;                      // IN2핀을 9번에 배선합니다.
@@ -132,6 +131,7 @@ void loop() {
   clientcall();
   while (true) {
     Serial.println("건조완료대기중");
+    Serial.println(WiFi.localIP());
     clientcall();
     if (Firebase.getInt("moist") < 4) {
       Serial.println("건조완료");
