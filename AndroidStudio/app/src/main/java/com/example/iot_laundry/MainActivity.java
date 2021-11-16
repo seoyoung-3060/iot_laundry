@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
+    // wifi 연결된 상태에만 액티비티 전환시킬 수 있는 것 끄자
     private final BroadcastReceiver wifiEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context_, Intent intent) {

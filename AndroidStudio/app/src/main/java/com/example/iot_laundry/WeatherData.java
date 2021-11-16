@@ -19,16 +19,27 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class WeatherData {
     private String weather = "", rain = "", reh = "", advice = "";
+    private String time;
+    private Date date;
     private String TAG = "WeatherDatalog";
     private DryingActivity dryingActivity;
 
-    public String lookUpWeather(String baseDate, String time, String nx, String ny, DryingActivity activity) throws IOException, JSONException {
-//        String baseDate = date;
+
+    public String lookUpWeather(Date date, String nx, String ny, DryingActivity activity) throws IOException, JSONException {
+        this.date = date;
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH00");     //HHmm이었던거 HH00으로 바꿈
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        time = timeFormat.format(date);
+
         String baseTime = timeChange(time);
+        String baseDate = dateFormat.format(this.date);
+
         String type = "json";
         this.dryingActivity = activity;
 
@@ -106,16 +117,20 @@ public class WeatherData {
                         if (category.equals("SKY")) {
                             if (fcstValue.equals("1")) {
                                 weather = "맑음 ";
-                                advice = "오늘은 맑네요! 창문/커튼을 활짝열어볼까요!";
+//                                advice = "오늘은 맑네요! 창문/커튼을 활짝열어볼까요!";
+                                advice = "오늘은 맑네요!\n빨래하기 좋은 날입니다!";
                             } else if (fcstValue.equals("2")) {
                                 weather = "비 ";
-                                advice = "오늘은 비가오네요! 창문/커튼을 닫고 에어컨켜는것을 추천드려요";
+//                                advice = "오늘은 비가오네요! 창문/커튼을 닫고 에어컨켜는것을 추천드려요";
+                                advice = "오늘은 비가오네요!\n빨래하지 않는 것을 추천드려요!";
                             } else if (fcstValue.equals("3")) {
                                 weather = "구름많음 ";
-                                advice = "오늘은 구름이 많네요! 창문열어도 괜찮을것같아요";
+//                                advice = "오늘은 구름이 많네요! 창문열어도 괜찮을것같아요";
+                                advice = "오늘은 구름이 많네요!\n강수확률에 따라 빨래를 미루는 게 좋겠어요";
                             } else if (fcstValue.equals("4")) {
                                 weather = "흐림 ";
-                                advice = "오늘은 흐리네요! 창문열어도 괜찮을것같아요";
+//                                advice = "오늘은 흐리네요! 창문열어도 괜찮을것같아요";
+                                advice = "오늘은 흐리네요!\n빨래 양을 줄이는 게 좋겠어요";
                             }
                         }
 
@@ -127,8 +142,9 @@ public class WeatherData {
                             reh = fcstValue + "%";
                         }
 
-                        Log.i("날씨", fcstValue);
+                        Log.i("습도", reh);
                         Log.i("카테고리", category);
+                        Log.d("WeatherData.java", advice);
                         Log.i("현재날씨", weather+rain+reh);
 
                         dryingActivity.runOnUiThread(new Runnable() {
@@ -196,6 +212,15 @@ public class WeatherData {
             case "2200":
                 time = "2000";
                 break;
+            //수민추가, 밤12시나 1시면 전 날 23시로 바꿔줌
+            case "0000":
+            case "0100":
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+                time = "2300";
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(date);
+                cal.add(Calendar.DATE, -1);
+                date = cal.getTime();
             default:
                 time = "2300";
 

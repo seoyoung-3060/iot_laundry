@@ -46,6 +46,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -86,6 +87,8 @@ public class DryingActivity extends AppCompatActivity {
 
     ProgressBar progressBar;
 
+    TextView textViewLocation;
+
     static long startMoist = 0;
 
     @Override
@@ -104,6 +107,7 @@ public class DryingActivity extends AppCompatActivity {
         humidityTextView = (TextView)findViewById(R.id.humidity);
         adviceTextView = (TextView)findViewById(R.id.textViewAdvice);
         textViewPercent = (TextView)findViewById(R.id.textViewPercent);
+        textViewLocation = findViewById(R.id.textViewLocation);
 
         toggleAC = findViewById(R.id.toggleAC);
         toggleCurtain = findViewById(R.id.toggleCurtain);
@@ -113,6 +117,8 @@ public class DryingActivity extends AppCompatActivity {
 
         createNotificationChannel();
 //        sendNotification();
+
+        showWeather();
 
         //click listener
         toggleAC.setOnClickListener(new View.OnClickListener() {
@@ -190,32 +196,36 @@ public class DryingActivity extends AppCompatActivity {
             public void onCancelled(@NonNull  DatabaseError error) {
             }
         });
-
         MyFirebase.moistRef.addValueEventListener(new ValueEventListener() {
+            long moist_old = 0, moist_new;
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Log.d(TAG, "moistRef onDataChange");
-//                String moistStr = String.valueOf((Long) dataSnapshot.getValue());
-//                Log.d(TAG, "moistRef");
-//                int moist =  Integer.parseInt(moistStr);
-                long moist = (Long) dataSnapshot.getValue();
-                Log.d(TAG, "moist: "+moist);
+                moist_new = (Long) dataSnapshot.getValue();
+
+                Log.d(TAG, "moist_new: "+moist_new);
+                Log.d(TAG, "moist_old: "+moist_old);
                 Log.d(TAG, "startMoist: "+startMoist);
 
-                if (startMoist != 0 && (startMoist > moist) ) {
-                    progressBar.setProgress((int) (startMoist - moist));
-                    Log.d(TAG, String.valueOf(startMoist - moist));
-                    double percent = Math.round(((double) (startMoist - moist) / (double) startMoist) * 100);
+
+//                if (startMoist != 0 && (startMoist > moist_new) && (moist_old > moist_new)) { 갑자기 값이 뛰는 경우가 있으므로 세번째껀 추가하지 말아야겠음
+                if (startMoist != 0 && (startMoist > moist_new)) {
+                    progressBar.setProgress((int) (startMoist - moist_new));
+                    Log.d(TAG, String.valueOf(startMoist - moist_new));
+                    double percent = Math.round(((double) (startMoist - moist_new) / (double) startMoist) * 100);
                     Log.d(TAG, "percent: "+percent);
-                    Log.d(TAG, "percent2: "+(startMoist - moist) / startMoist);
+                    Log.d(TAG, "percent2: "+(startMoist - moist_new) / startMoist);
                     textViewPercent.setText(String.valueOf(percent));
                 }
+                moist_old = moist_new;
+
                 //건조완료 시
-                if (startMoist > 4 && moist < 4) {
+                if (startMoist > 4 && moist_new < 4) {
                     sendNotification();
-                    Log.d(TAG, "건조완료, moist: " + moist);
+                    Log.d(TAG, "건조완료, moist: " + moist_new);
                     startMoist = 0;
                     MyFirebase.startRef.setValue(false); //시스템 가동 중 아님
+                    MyFirebase.startMoistRef.setValue(0);
                     textViewPercent.setText("100");
                     progressBar.setProgress((int) startMoist);
 
@@ -241,58 +251,45 @@ public class DryingActivity extends AppCompatActivity {
         }else {
             checkRunTimePermission();
         }
+    }
+    private void showWeather() {
+        // 현재 시간 및 날짜 얻어오기
+        now = System.currentTimeMillis(); //현재 시간 가져오기
+        Date = new Date(now);             //Date 생성하기
 
-        final TextView textViewLocation = (TextView)findViewById(R.id.textViewLocation);
-        Button buttonShowLocation = (Button) findViewById(R.id.reset_button);
+        // GPS 위치 얻어오기
+        gpsTracker = new GPSTracker(DryingActivity.this);
+        double latitude = gpsTracker.getLatitude();
+        double longitude = gpsTracker.getLongitude();
 
-        buttonShowLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 현재 시간 및 날짜 얻어오기
-                now = System.currentTimeMillis(); //현재 시간 가져오기
-                Date = new Date(now);             //Date 생성하기
+        address = getCurrentAddress(latitude, longitude);
+        Log.i("address",address);
 
-                time = timeFormat.format(Date);
-                date = dateFormat.format(Date);
+        String[] local = address.split(" "); //local[0]==대한민국 local[1]==부산광역시 local[2]==금정구 local[3]==장전동
+        String localName = local[2];//'구'이름 불러옴
+        String addressStr = "";
+        for (int i=1; i < local.length; i++) {
+            addressStr += local[i] + " ";
+        }
 
-                Log.i("time",time);
-                Log.i("date",date);
+        readExcel(localName); //행정시 이름으로 격자값 구하기
+        Toast.makeText(DryingActivity.this, localName, Toast.LENGTH_LONG).show();
 
-                // GPS 위치 얻어오기
-                gpsTracker = new GPSTracker(DryingActivity.this);
-                double latitude = gpsTracker.getLatitude();
-                double longitude = gpsTracker.getLongitude();
+        Log.i("localname",localName);
 
-                address = getCurrentAddress(latitude, longitude);
-                Log.i("address",address);
+        String weather = "";
+        WeatherData weatherData = new WeatherData();
+        try {
+            weather = weatherData.lookUpWeather(Date, x, y, DryingActivity.this);
+            Log.d(TAG, weather);
+        } catch (JSONException e) {
+            Log.i("WEATHER_JSONERROR", e.getMessage());
+        } catch (IOException e) {
+            Log.i("WEATHER_IOERROR",e.getMessage());
+        }
+        Log.i("현재날씨",weather);
 
-                String[] local = address.split(" "); //local[0]==대한민국 local[1]==부산광역시 local[2]==금정구 local[3]==장전동
-                String localName = local[2];//'구'이름 불러옴
-
-                readExcel(localName); //행정시 이름으로 격자값 구하기
-                Toast.makeText(DryingActivity.this, localName, Toast.LENGTH_LONG).show();
-
-                Log.i("localname",localName);
-
-                String weather = "";
-                WeatherData weatherData = new WeatherData();
-                try {
-                    weather = weatherData.lookUpWeather(date, time, x, y, DryingActivity.this);
-                    Log.d(TAG, weather);
-                } catch (JSONException e) {
-                    Log.i("WEATHER_JSONERROR", e.getMessage());
-                } catch (IOException e) {
-                    Log.i("WEATHER_IOERROR",e.getMessage());
-                }
-                Log.i("현재날씨",weather);
-
-                textViewLocation.setText(address);
-
-//                        Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
-            }
-
-        });
-
+        textViewLocation.setText(addressStr);
     }
 
     private void readExcel(String localName) {
