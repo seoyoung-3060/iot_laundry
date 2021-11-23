@@ -17,17 +17,15 @@
 #define FIREBASE_HOST "iot-laundry02-default-rtdb.firebaseio.com"
 #define FIREBASE_AUTH "qlNCOwAypMDI1bjWPus5Szvs32lTDu1EDkRqEqiy"
 
-//#define WIFI_SSID "SK_WiFiGIGA2B95"  
-//#define WIFI_PASSWORD "1603064717"  
-//
-//#define WIFI_SSID "twosome_DMC(2G)"
-//#define WIFI_PASSWORD "twosomedmc1!"
+//#define WIFI_SSID "winterz"
+//#define WIFI_PASSWORD "201105166"
 
-#define WIFI_SSID "winterz"
-#define WIFI_PASSWORD "201105166"
+#define WIFI_SSID            "KT_GiGA_2G_sumin" // AP server name
+#define WIFI_PASSWORD        "sumin78900"         // AP server password
 
-//#define WIFI_SSID "커피나무"  
-//#define WIFI_PASSWORD "000012345a" 
+IPAddress ip(172, 30, 1, 90); // 사용할 IP 주소
+IPAddress gateway(172, 30, 1, 254); // 게이트웨이 주소
+IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
 
 int MOISTPIN = A0;
 
@@ -38,6 +36,7 @@ void setup() {
   Serial.begin(9600);  
   
   // connect to wifi.  
+  WiFi.config(ip, gateway, subnet); // before or after Wifi.Begin(ssid, password);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);  
   Serial.print("connecting");  
   while (WiFi.status() != WL_CONNECTED) {  
@@ -60,20 +59,16 @@ void setup() {
 }  
     
 void loop() {  
-  /** 임시로 시리얼 모니터에 1이 입력된게 클라이언트와 연결된걸로 가정 **/
-//  if (Serial.read()!= '1') {             
-//    return;
-//  }
-//  Serial.println("앱으로부터 연결 완료, 건조 시스템 시작");
+  Serial.println(WiFi.localIP());
 
 /** 클라이언트(앱) 처리. 연결 안됐으면 return; **/
   Serial.println("요청 기다리는 중");
-  WiFiClient client = server.available();
+  WiFiClient client = server.available(); //클라이언트와 연결됐는지 확인
   if (!client) {
     return;
   }
   Serial.println("앱으로부터 연결 완료, 건조 시스템 시작");
-  while (!client.available()) {
+  while (!client.available()) {  //클라이언트가 데이터를 보낼때까지 기다림
     delay(1);
   }
   String request = client.readStringUntil('\r');
@@ -97,6 +92,8 @@ void loop() {
     // soil sensor
     delay(2000);  //2초 단위, 테스트용
   //  delay(20000);   //2분 단위, 시현용
+
+  Serial.println(WiFi.localIP());
     int moist = analogRead(MOISTPIN);
   
     // 디버깅용, 시리얼 모니터에 출력

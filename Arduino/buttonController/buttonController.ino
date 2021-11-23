@@ -30,14 +30,17 @@ Servo myservo;
 int SERVOPIN = 2; //D4번 핀
 int angle = 0;
 
+//고정 ip 설정
+IPAddress ip(172, 30, 1, 90); // 사용할 IP 주소
+IPAddress gateway(172, 30, 1, 254); // 게이트웨이 주소
+IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
+  
 void setup() {
   Serial.begin(9600);
   myservo.attach(SERVOPIN);
 
   // connect to wifi.
-  IPAddress ip(172, 30, 1, 100); // 사용할 IP 주소
-  IPAddress gateway(172, 30, 1, 254); // 게이트웨이 주소
-  IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
+
   WiFi.config(ip, gateway, subnet); // before or after Wifi.Begin(ssid, password);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("connecting");

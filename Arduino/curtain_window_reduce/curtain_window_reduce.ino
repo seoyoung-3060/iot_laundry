@@ -51,6 +51,11 @@ int lookup[8] = {B01000, B01100, B00100, B00110, B00010, B00011, B00001, B01001}
 boolean curtain_state = false;
 boolean window_state = false;
 
+//고정 ip
+IPAddress ip(172, 30, 1, 110); // 사용할 IP 주소
+IPAddress gateway(172, 30, 1, 254); // 게이트웨이 주소
+IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
+
 void setup() {
   Serial.begin(9600);
   pinMode(IN1, OUTPUT);    // IN1을 출력핀으로 설정합니다.
@@ -64,6 +69,7 @@ void setup() {
   pinMode(IN8, OUTPUT);    // IN4을 출력핀으로 설정합니다.
 
   // connect to wifi.
+  WiFi.config(ip, gateway, subnet);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("connecting");
   while (WiFi.status() != WL_CONNECTED) {
