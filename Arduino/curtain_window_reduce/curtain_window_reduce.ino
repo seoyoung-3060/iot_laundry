@@ -19,12 +19,19 @@
 #define WINDOW 0
 #define CURTAIN 1
 //
-//#define WIFI_SSID "SK_WiFiGIGA2B95"
-//#define WIFI_PASSWORD "1603064717"
-//#define WIFI_SSID "winterz"
-//#define WIFI_PASSWORD "201105166"
-#define WIFI_SSID "KT_GiGA_2G_sumin"
-#define WIFI_PASSWORD "sumin78900"
+//#define WIFI_SSID "KT_GiGA_2G_sumin"
+//#define WIFI_PASSWORD "sumin78900"
+//IPAddress ip(172, 30, 1, 110); // 사용할 IP 주소
+//IPAddress gateway(172, 30, 1, 254); // 게이트웨이 주소
+//IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
+
+//핫스팟
+#define WIFI_SSID "winterz"
+#define WIFI_PASSWORD "201105166"
+IPAddress ip(192, 168, 246, 110); // 사용할 IP 주소
+IPAddress gateway(192, 168, 246, 198); // 게이트웨이 주소
+IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
+
 
 WiFiServer server(80); //추가
 
@@ -50,11 +57,6 @@ int lookup[8] = {B01000, B01100, B00100, B00110, B00010, B00011, B00001, B01001}
 // 스텝모터를 제어할 방향의 코드를 미리 설정합니다.
 boolean curtain_state = false;
 boolean window_state = false;
-
-//고정 ip
-IPAddress ip(172, 30, 1, 110); // 사용할 IP 주소
-IPAddress gateway(172, 30, 1, 254); // 게이트웨이 주소
-IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
 
 void setup() {
   Serial.begin(9600);
@@ -98,16 +100,19 @@ void open(int flag) {
   if (flag == WINDOW) {
     window_state = true;
     countsperrev = COUNT_WINDOW;
+//    Firebase.setBool("/window", true); //써지질 않음 
+    
   } else if (flag == CURTAIN) {
     curtain_state = true;
     countsperrev = COUNT_CURTAIN;
+    Firebase.setBool("/curtain", curtain_state);
   }
 
   while (count < countsperrev) {                 // count가 countsperrev 보다 작으면
     yield(); //Soft WDT reset 에러 없애기 위해 추가
     Serial.print("countsperrev, count: ");
     Serial.println((String) countsperrev + ", " + count);
-    clockwise(flag);
+    anticlockwise(flag);
     count++;// anticlockwise()함수를 실행합니다.
   }
 }
@@ -118,17 +123,20 @@ void close(int flag) {
   int countsperrev;
   if (flag == WINDOW) {
     window_state = false;
-    countsperrev = COUNT_WINDOW;
+    countsperrev = COUNT_WINDOW;//왜안되노... 
+
+    Firebase.setBool("/window", false);
   } else if (flag == CURTAIN) {
     curtain_state = false;
     countsperrev = COUNT_CURTAIN;
+//    Firebase.setBool("/curtain", false);
   }
 
   while (count < countsperrev) {                 // count가 countsperrev 보다 작으면
     yield(); //Soft WDT reset 에러 없애기 위해 추가
     Serial.print("countsperrev, count: ");
     Serial.println((String) countsperrev + ", " + count);
-    anticlockwise(flag);
+    clockwise(flag);
     count++;// clockwise()함수를 실행합니다.
   }
 }

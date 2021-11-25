@@ -2,6 +2,7 @@ package com.example.iot_laundry;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatToggleButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
@@ -26,7 +27,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,13 +42,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -59,17 +57,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class DryingActivity extends AppCompatActivity {
+public class DryingActivity extends AppCompatActivity implements View.OnClickListener{
     //현재시간&날짜 가져오기
     long now; //ll
     Date Date;
-//    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss"); //dateFormat바꿈
-    //date와 time String으로 가져오기
-    SimpleDateFormat timeFormat = new SimpleDateFormat("HH00");     //HHmm이었던거 HH00으로 바꿈
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
-    TextView dateTextView, weatherTextView, rainTextView, humidityTextView, adviceTextView, textViewPercent;
-
+    TextView dateTextView, weatherTextView, rainTextView, humidityTextView, adviceTextView, textViewPercent, textViewLocation;
+    ImageButton button_setting;
 
     private GPSTracker gpsTracker;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -87,8 +81,6 @@ public class DryingActivity extends AppCompatActivity {
 
     ProgressBar progressBar;
 
-    TextView textViewLocation;
-
     static long startMoist = 0;
 
     @Override
@@ -98,78 +90,18 @@ public class DryingActivity extends AppCompatActivity {
 
         showCurrentTime();
 
-        //init view
-        progressBar = findViewById(R.id.progressBar);
+        initView();
+        //토글버턴 상태설정이안됨..
+//        toggleAC.setChecked(true);toggleAC.setSelected(true);
+//        toggleWindow.setChecked(false);toggleWindow.setSelected(false);
+//        toggleCurtain.setChecked(true);toggleCurtain.setSelected(true);
 
-        dateTextView = (TextView)findViewById(R.id.textViewTime);
-        weatherTextView = (TextView)findViewById(R.id.weather);
-        rainTextView = (TextView)findViewById(R.id.rain);
-        humidityTextView = (TextView)findViewById(R.id.humidity);
-        adviceTextView = (TextView)findViewById(R.id.textViewAdvice);
-        textViewPercent = (TextView)findViewById(R.id.textViewPercent);
-        textViewLocation = findViewById(R.id.textViewLocation);
-
-        toggleAC = findViewById(R.id.toggleAC);
-        toggleCurtain = findViewById(R.id.toggleCurtain);
-        toggleWindow = findViewById(R.id.toggleWindow);
-
-        toggleButtonList = new ToggleButton[]{toggleAC, toggleCurtain, toggleWindow};
+        restore(); //토글버튼 상태 복원을 원했으나 안됨 ㅡㅡ
 
         createNotificationChannel();
 //        sendNotification();
 
         showWeather();
-
-        //click listener
-        toggleAC.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean isChecked = toggleAC.isChecked();
-                MyFirebase.acRef.setValue(isChecked);
-
-                String ac_status;
-                if (isChecked){
-                    ac_status = "acOn";
-                } else {
-                    ac_status = "acOff";
-                }
-                Log.i("ac", ac_status);
-                HttpRequestTask requestTask = new HttpRequestTask(MyServer.buttonAddress);
-                requestTask.execute(ac_status);
-            }
-        });
-        toggleCurtain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean isChecked = toggleCurtain.isChecked();
-                MyFirebase.curtRet.setValue(isChecked);
-
-                String curtain_status;
-                if (isChecked){
-                    curtain_status = "curtOn";
-                } else {
-                    curtain_status = "curtOff";
-                }
-                HttpRequestTask requestTask = new HttpRequestTask(MyServer.curtainAddress);
-                requestTask.execute(curtain_status);
-            }
-        });
-        toggleWindow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean isChecked = toggleWindow.isChecked();
-                MyFirebase.winRet.setValue(isChecked);
-
-                String window_status;
-                if (isChecked){
-                    window_status = "winOn";
-                } else {
-                    window_status = "winOff";
-                }
-                HttpRequestTask requestTask = new HttpRequestTask(MyServer.windowAddress);
-                requestTask.execute(window_status);
-            }
-        });
 
         MyFirebase.startMoistRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -189,8 +121,6 @@ public class DryingActivity extends AppCompatActivity {
                 for (ToggleButton tb: toggleButtonList) {
                     tb.setChecked(false);
                 }
-
-
             }
             @Override
             public void onCancelled(@NonNull  DatabaseError error) {
@@ -252,6 +182,113 @@ public class DryingActivity extends AppCompatActivity {
             checkRunTimePermission();
         }
     }
+    private void initView() {
+        progressBar = findViewById(R.id.progressBar);
+
+        button_setting = findViewById(R.id.button_setting);
+
+        dateTextView = (TextView)findViewById(R.id.textViewTime);
+        weatherTextView = (TextView)findViewById(R.id.weather);
+        rainTextView = (TextView)findViewById(R.id.rain);
+        humidityTextView = (TextView)findViewById(R.id.humidity);
+        adviceTextView = (TextView)findViewById(R.id.textViewAdvice);
+        textViewPercent = (TextView)findViewById(R.id.textViewPercent);
+        textViewLocation = findViewById(R.id.textViewLocation);
+
+        toggleAC = findViewById(R.id.toggleAC);
+        toggleCurtain = findViewById(R.id.toggleCurtain);
+        toggleWindow = findViewById(R.id.toggleWindow);
+
+        toggleCurtain.setOnClickListener(this);
+        toggleAC.setOnClickListener(this);
+        toggleWindow.setOnClickListener(this);
+
+        toggleButtonList = new ToggleButton[]{toggleAC, toggleCurtain, toggleWindow};
+
+        button_setting.setOnClickListener(this);
+    }
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        if (id == R.id.toggleAC) {
+            Log.d(TAG, "toggleAc버튼 클릭됨");
+            boolean isChecked = toggleAC.isChecked();
+            MyFirebase.acRef.setValue(isChecked);
+            Log.d(TAG, String.valueOf(isChecked));
+
+            String ac_status;
+            if (isChecked)    ac_status = "acOn";
+            else              ac_status = "acOff";
+
+            Log.i(TAG, "ac: " + ac_status);
+            HttpRequestTask requestTask = new HttpRequestTask(MyServer.buttonAddress);
+            requestTask.execute(ac_status);
+        } else if (id == R.id.toggleCurtain) {
+            boolean isChecked = toggleCurtain.isChecked();
+            MyFirebase.curtRef.setValue(isChecked);
+            Log.d(TAG,"ㅋㅋㅋ");
+
+            String curtain_status;
+            if (isChecked)                curtain_status = "curtOn";
+            else                          curtain_status = "curtOff";
+
+            HttpRequestTask requestTask = new HttpRequestTask(MyServer.curtainAddress);
+            requestTask.execute(curtain_status);
+        } else if (id == R.id.toggleWindow) {
+            boolean isChecked = toggleWindow.isChecked();
+            MyFirebase.winRef.setValue(isChecked);
+
+            String window_status;
+            if (isChecked)                window_status = "winOn";
+            else                          window_status = "winOff";
+
+            HttpRequestTask requestTask = new HttpRequestTask(MyServer.windowAddress);
+            requestTask.execute(window_status);
+        } else if (id == R.id.button_setting) {
+            SettingDialog bottomSheet = new SettingDialog();
+            bottomSheet.show(getSupportFragmentManager(), "addDiary");
+        }
+    }
+    private void restore() { //안되는중 ㅡㅡ..
+        MyFirebase.acRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                } else {
+                    Log.d("firebase ac ", String.valueOf(task.getResult().getValue())); //값은 잘 불러와지는데
+                    boolean acVal = (boolean) task.getResult().getValue();
+                    toggleAC.setChecked(true); //이게안돼
+                }
+            }
+        });
+        MyFirebase.winRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                } else {
+                    Log.d("firebase win", String.valueOf(task.getResult().getValue()));
+                    boolean winVal = (boolean) task.getResult().getValue();
+                    toggleWindow.setChecked(winVal);
+                }
+            }
+        });
+        MyFirebase.curtRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                } else {
+                    Log.d("firebase curt", String.valueOf(task.getResult().getValue()));
+                    boolean acVal = (boolean) task.getResult().getValue();
+                    toggleCurtain.setChecked(acVal);
+                }
+            }
+        });
+//        View.requestLayout();
+    }
+
     private void showWeather() {
         // 현재 시간 및 날짜 얻어오기
         now = System.currentTimeMillis(); //현재 시간 가져오기
@@ -456,6 +493,7 @@ public class DryingActivity extends AppCompatActivity {
 
                 break;
         }
+        restore();
     }
 
     public boolean checkLocationServicesStatus() {
@@ -510,6 +548,7 @@ public class DryingActivity extends AppCompatActivity {
         notificationManager.notify(0, notificationBuilder.build());
     }
 
+
     public static class HttpRequestTask extends AsyncTask<String, Void, String> {
         private String serverAddress;// = MyServer.serverAddress;
         private String TAG = "HttpRequestTask";
@@ -561,16 +600,16 @@ public class DryingActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        MyFirebase.startMoistRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                    Log.d(TAG, "startMoist: " + String.valueOf(task.getResult().getValue()));
-
-                    //파이어베이스에 값이 적어진 뒤 한참 후에 메소드가 호출되지만 그래도 ㄱㅊ은듯
-                    startMoist = (Long) task.getResult().getValue();
-//                    progressBar.setMax((int) startMoist);
-                }
-            });
+//        MyFirebase.startMoistRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+//                @Override
+//                public void onComplete(@NonNull Task<DataSnapshot> task) {
+//                    Log.d(TAG, "startMoist: " + String.valueOf(task.getResult().getValue()));
+//
+//                    //파이어베이스에 값이 적어진 뒤 한참 후에 메소드가 호출되지만 그래도 ㄱㅊ은듯
+//                    startMoist = (Long) task.getResult().getValue();
+////                    progressBar.setMax((int) startMoist);
+//                }
+//            });
     }
 
     private void showCurrentTime() {

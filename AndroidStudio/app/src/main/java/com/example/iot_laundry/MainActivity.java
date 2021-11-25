@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         buttonStart = findViewById(R.id.buttonStart);
 
-        this.registerReceiver(wifiEventReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+//        this.registerReceiver(wifiEventReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
                 //시작 시의 수분센서값 넘겨주어야 함
 
                 startActivity(intent);
-
                 String activityState = "start";
 //                DryingActivity.HttpRequestTask httpRequestTask = new DryingActivity.HttpRequestTask();
                 DryingActivity.HttpRequestTask requestTask = new DryingActivity.HttpRequestTask(MyServer.moistAddress);
@@ -67,8 +66,7 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (!task.isSuccessful()) {
                     Log.e("firebase", "Error getting data", task.getException());
-                }
-                else {
+                } else {
                     Log.d("firebase", String.valueOf(task.getResult().getValue()));
                     long startMoist = (Long) task.getResult().getValue();
                     if (startMoist != 0) {
@@ -86,27 +84,29 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-    // wifi 연결된 상태에만 액티비티 전환시킬 수 있는 것 끄자
-    private final BroadcastReceiver wifiEventReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context_, Intent intent) {
-            String action = intent.getAction();
-            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-                NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-                if(networkInfo.getType() == ConnectivityManager.TYPE_WIFI && networkInfo.isConnected()) {
-                    Toast.makeText(context_, "WIFI 연결 상태입니다.", Toast.LENGTH_SHORT).show();
-                    buttonStart.setEnabled(true);
-
-                } else {
-                    Toast.makeText(context_, "WIFI 연결 상태를 확인 해주세요.", Toast.LENGTH_SHORT).show();
-                    buttonStart.setEnabled(false);
-                }
-            }
-        }
-    };
 }
-
 /** END OF CODE **/
+
+//    // wifi 연결된 상태에만 액티비티 전환시킬 수 있는 것 끄자
+//    private final BroadcastReceiver wifiEventReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context_, Intent intent) {
+//            String action = intent.getAction();
+//            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+//                NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+//                if(networkInfo.getType() == ConnectivityManager.TYPE_WIFI && networkInfo.isConnected()) {
+//                    Toast.makeText(context_, "WIFI 연결 상태입니다.", Toast.LENGTH_SHORT).show();
+//                    buttonStart.setEnabled(true);
+//
+//                } else {
+//                    Toast.makeText(context_, "WIFI 연결 상태를 확인 해주세요.", Toast.LENGTH_SHORT).show();
+//                    buttonStart.setEnabled(false);
+//                }
+//            }
+//        }
+//    };
+
+
 //final AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
 //                    builder.setTitle("와이파이 연결을 해주세요");
 //                            builder.setMessage("와이파이가 연결돼야 건조 시스템을 이용하실 수 있어요!");

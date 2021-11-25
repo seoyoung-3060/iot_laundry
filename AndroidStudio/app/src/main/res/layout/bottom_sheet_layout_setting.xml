@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android ="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <View
+        android:layout_width="70dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:background="@color/light_grey" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"        >
+
+        <ImageView
+            android:id="@+id/imageView_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_clear_24" />
+
+        <TextView
+            android:id="@+id/textView_filter"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="상태 설정"
+            android:textColor="@color/grey"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_gravity="center" />
+
+    </RelativeLayout>
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <RelativeLayout
+                android:id="@+id/layout_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+                <ImageView
+                    android:id="@+id/image_air"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_baseline_air_24"
+                    android:layout_margin="10dp"/>
+                <TextView
+                    android:id="@+id/text_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/image_air"
+                    android:layout_marginLeft="10dp"
+                    android:text="에어컨의 현재 상태를 설정해주세요"
+                    />
+                <RadioGroup
+                    android:id="@+id/radioGroup_ac"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/image_air"
+                    android:layout_marginTop="15dp"
+                    android:orientation="horizontal">
+                    <RadioButton
+                        android:id="@+id/radioButton_ac_on"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/grey"
+                        android:textStyle="bold"
+                        android:layout_weight="1"
+                        android:text="켜짐"/>
+                    <RadioButton
+                        android:id="@+id/radioButton_ac_off"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/grey"
+                        android:textStyle="bold"
+                        android:layout_weight="1"
+                        android:text="꺼짐"/>
+                </RadioGroup>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/layout_window"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+                <ImageView
+                    android:id="@+id/image_window"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_baseline_window_24"
+                    android:layout_margin="10dp"/>
+                <TextView
+                    android:id="@+id/text_window"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/image_window"
+                    android:layout_marginLeft="10dp"
+                    android:text="창문의 현재 상태를 설정해주세요"
+                    />
+                <RadioGroup
+                    android:id="@+id/radioGroup_window"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/image_window"
+                    android:layout_marginTop="15dp"
+                    android:orientation="horizontal">
+                    <RadioButton
+                        android:id="@+id/radioButton_window_on"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/grey"
+                        android:textStyle="bold"
+                        android:layout_weight="1"
+                        android:text="열림"/>
+                    <RadioButton
+                        android:id="@+id/radioButton_window_off"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/grey"
+                        android:textStyle="bold"
+                        android:layout_weight="1"
+                        android:text="닫힘"/>
+                </RadioGroup>
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/layout_ac"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+                <ImageView
+                    android:id="@+id/image_ac"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_baseline_sensor_window_24"
+                    android:layout_margin="10dp"/>
+                <TextView
+                    android:id="@+id/text_ac"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/image_ac"
+                    android:layout_marginLeft="10dp"
+                    android:text="커텐의 현재 상태를 설정해주세요"
+                    />
+                <RadioGroup
+                    android:id="@+id/radioGroup_curtain"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/image_ac"
+                    android:layout_marginTop="15dp"
+                    android:orientation="horizontal">
+                    <RadioButton
+                        android:id="@+id/radioButton_curtain_on"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/grey"
+                        android:textStyle="bold"
+                        android:layout_weight="1"
+                        android:text="열림"/>
+                    <RadioButton
+                        android:id="@+id/radioButton_curtain_off"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/grey"
+                        android:textStyle="bold"
+                        android:layout_weight="1"
+                        android:text="닫힘"/>
+                </RadioGroup>
+            </RelativeLayout>
+
+
+
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal" >
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_save"
+            android:layout_margin="20dp"
+            android:background="@drawable/bg_round_stroke"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="저장"
+            android:onClick="onClickBtnSet"/>
+    </LinearLayout>
+</LinearLayout>

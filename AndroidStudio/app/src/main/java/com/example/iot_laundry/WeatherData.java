@@ -138,9 +138,9 @@ public class WeatherData {
                             rain = fcstValue + "%";
                         }
 
-                        if (category.equals("REH")) {
+                        if (category.equals("REH")) { //습도값 왜 안나오지?
                             reh = fcstValue + "%";
-                        }
+                        } else reh = "0%";
 
                         Log.i("습도", reh);
                         Log.i("카테고리", category);

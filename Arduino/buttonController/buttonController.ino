@@ -16,10 +16,20 @@
 #define FIREBASE_HOST "iot-laundry02-default-rtdb.firebaseio.com"
 #define FIREBASE_AUTH "qlNCOwAypMDI1bjWPus5Szvs32lTDu1EDkRqEqiy"
 
-//#define WIFI_SSID "SK_WiFiGIGA2B95"
-//#define WIFI_PASSWORD "1603064717"
-#define WIFI_SSID "KT_GiGA_2G_sumin"
-#define WIFI_PASSWORD "sumin78900"
+////수민집
+//#define WIFI_SSID "KT_GiGA_2G_sumin"
+//#define WIFI_PASSWORD "sumin78900"
+//IPAddress ip(172, 30, 1, 90); // 사용할 IP 주소
+//IPAddress gateway(172, 30, 1, 254); // 게이트웨이 주소
+//IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
+
+//핫스팟
+#define WIFI_SSID "winterz"
+#define WIFI_PASSWORD "201105166"
+IPAddress ip(192, 168, 246, 100); // 사용할 IP 주소
+IPAddress gateway(192, 168, 246, 198); // 게이트웨이 주소
+IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
+
 
 WiFiServer server(80); //추가
 
@@ -30,10 +40,6 @@ Servo myservo;
 int SERVOPIN = 2; //D4번 핀
 int angle = 0;
 
-//고정 ip 설정
-IPAddress ip(172, 30, 1, 90); // 사용할 IP 주소
-IPAddress gateway(172, 30, 1, 254); // 게이트웨이 주소
-IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
   
 void setup() {
   Serial.begin(9600);
