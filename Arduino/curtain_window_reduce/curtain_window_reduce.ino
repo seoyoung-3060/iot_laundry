@@ -1,4 +1,4 @@
-//https://www.javatpoint.com/iot-project-google-firebase-nodemcu
+///https://www.javatpoint.com/iot-project-google-firebase-nodemcu
 #include <Firebase.h>
 #include <FirebaseArduino.h>
 #include <FirebaseCloudMessaging.h>
@@ -26,18 +26,18 @@
 //IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
 
 //핫스팟
-//#define WIFI_SSID "winterz"
-//#define WIFI_PASSWORD "201105166"
-//IPAddress ip(192, 168, 132, 110); // 사용할 IP 주소
-//IPAddress gateway(192, 168, 132, 34); // 게이트웨이 주소/IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
-//IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
+#define WIFI_SSID "winterz"
+#define WIFI_PASSWORD "201105166"
+IPAddress ip(192, 168, 120, 110); // 사용할 IP 주소
+IPAddress gateway(192, 168, 120, 34); // 게이트웨이 주소/IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
+IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
 
 //핫스팟
-#define WIFI_SSID "iPhone"
-#define WIFI_PASSWORD "63113515"
-IPAddress ip(172, 20, 10, 110); // 사용할 IP 주소
-IPAddress gateway(172, 20, 10, 1); // 게이트웨이 주소
-IPAddress subnet(255, 255, 255, 240); // 서브넷 주소
+//#define WIFI_SSID "iPhone"
+//#define WIFI_PASSWORD "63113515"
+//IPAddress ip(172, 20, 10, 110); // 사용할 IP 주소
+//IPAddress gateway(172, 20, 10, 1); // 게이트웨이 주소
+//IPAddress subnet(255, 255, 255, 240); // 서브넷 주소
 
 
 WiFiServer server(80); //추가
@@ -49,13 +49,13 @@ int IN3 = D10;                    // IN3핀을 10번에 배선합니다.
 int IN4 = D11;                    // IN4핀을 11번에 배선합니다.
 
 //위모스 D1용 핀배열, curtain 핀
-int IN5 = D2;                      // IN1핀을 8번에 배선합니다.
-int IN6 = D3;                      // IN2핀을 9번에 배선합니다.
-int IN7 = D4;                    // IN3핀을 10번에 배선합니다.
-int IN8 = D5;                    // IN4핀을 11번에 배선합니다.
+int IN5 = D4;                      // IN1핀을 8번에 배선합니다.
+int IN6 = D5;                      // IN2핀을 9번에 배선합니다.
+int IN7 = D6;                    // IN3핀을 10번에 배선합니다.
+int IN8 = D7;                    // IN4핀을 11번에 배선합니다.
 
 
-int motorSpeed = 1200;     // 스텝모터의 속도를 정할 수 있습니다.
+int motorSpeed = 1200;     // 스텝모터의 속도를 정할 수 있습니다. 원본 1200, 800안됨 1000됨 
 // 스텝을 카운트하여 얼마나 회전했는지 확인할 수 있습니다.
 #define COUNT_WINDOW 512
 #define COUNT_CURTAIN 1536

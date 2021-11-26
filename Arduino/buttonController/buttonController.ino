@@ -24,14 +24,11 @@
 //IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
 
 //핫스팟
-#define WIFI_SSID "winterz"
-#define WIFI_PASSWORD "201105166"
-//IPAddress ip(192, 168, 246, 100); // 사용할 IP 주소
-//IPAddress gateway(192, 168, 246, 198); // 게이트웨이 주소
+//#define WIFI_SSID "winterz"
+//#define WIFI_PASSWORD "201105166"
+//IPAddress ip(192, 168, 132, 100); // 사용할 IP 주소
+//IPAddress gateway(192, 168, 132, 34); // 게이트웨이 주소
 //IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
-IPAddress ip(192, 168, 132, 100); // 사용할 IP 주소
-IPAddress gateway(192, 168, 132, 34); // 게이트웨이 주소
-IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
 
 //핫스팟
 #define WIFI_SSID "iPhone"
