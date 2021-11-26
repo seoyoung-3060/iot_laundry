@@ -39,28 +39,17 @@
     <color name="bg_pointgrey">#f2f1ed</color>
     <color name="bg_lightgrey">#fafafa</color>
 
-
-
     <!--식물상세이지.백과사전,돋보기,나의정원,페이보릿 순-->
     <color name="bg_plant_detail">#f4f5f9</color>
-    <!--bottom navigation bar-->
-    <!--    <color name="home">#2196F3</color>-->
-    <!--    <color name="activity">#673AB7</color>-->
-    <!--    <color name="favorites">#E91E63</color>-->
-    <!--    <color name="settings">#4CAF50</color>-->
     <color name="navigation_color_1">#8D3DFF</color>
     <color name="navigation_color_2">#E6A919</color>
     <color name="navigation_color_3">#4CAF50</color>
     <color name="navigation_color_4">#E91E63</color>
 
-    <!--    <color name="navigation_color_1">#6200EE</color>-->
-    <!--    <color name="navigation_color_2">#C9379D</color>-->
-    <!--    <color name="navigation_color_3">#E6A919</color>-->
-    <!--    <color name="navigation_color_4">#008577</color>-->
-    <!--    <color name="navigation_color_5">#1194AA</color>-->
-
-
-
+    <!--    만수컬러-->
+    <color name="bg_grey">#f2f2f2</color>
+    <color name="point_blue">#4d6fe3</color>
+    <color name="seek_bar_background">#99000000</color>
 
 
 </resources>

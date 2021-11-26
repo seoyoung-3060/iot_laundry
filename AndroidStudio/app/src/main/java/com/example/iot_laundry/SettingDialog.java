@@ -2,6 +2,7 @@ package com.example.iot_laundry;
 
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -20,6 +21,8 @@ import com.example.iot_laundry.firebase.MyFirebase;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.util.List;
+
 public class SettingDialog extends BottomSheetDialogFragment implements View.OnClickListener {
     private static String TAG = SettingDialog.class.getSimpleName();
 
@@ -27,9 +30,8 @@ public class SettingDialog extends BottomSheetDialogFragment implements View.OnC
     RadioButton radioButton_ac_on, radioButton_ac_off, radioButton_window_on, radioButton_window_off, radioButton_curtain_on, radioButton_curtain_off;
     Button btn_save;
 
+    private BottomSheetListener bottomSheetListener;
 
-    //DB - firestore
-    Long time;
 
     @Nullable
     @Override
@@ -113,9 +115,23 @@ public class SettingDialog extends BottomSheetDialogFragment implements View.OnC
                     MyFirebase.curtRef.setValue(false);
                 }
 
-
+                bottomSheetListener.onButtonApply();
                 dismiss();
                 break;
         }
+    }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            bottomSheetListener = (BottomSheetListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement BottomSheetListener");
+        }
+    }
+
+
+    public interface BottomSheetListener {
+        void onButtonApply();
     }
 }

@@ -3,6 +3,7 @@ package com.example.iot_laundry;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatToggleButton;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
@@ -29,6 +30,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -57,7 +59,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class DryingActivity extends AppCompatActivity implements View.OnClickListener{
+public class DryingActivity extends AppCompatActivity implements View.OnClickListener, SettingDialog.BottomSheetListener {
     //현재시간&날짜 가져오기
     long now; //ll
     Date Date;
@@ -76,8 +78,8 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
 
     private String TAG = "DryingActivityLog";
 
-    ToggleButton toggleAC, toggleCurtain, toggleWindow;
-    ToggleButton[] toggleButtonList;
+
+    SwitchCompat switch_curtain, switch_window, switch_ac;
 
     ProgressBar progressBar;
 
@@ -117,10 +119,9 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
                     bool = true;
                 } else bool = false;
 
-
-                for (ToggleButton tb: toggleButtonList) {
-                    tb.setChecked(false);
-                }
+                switch_ac.setChecked(false);
+                switch_curtain.setChecked(false);
+                switch_window.setChecked(false);
             }
             @Override
             public void onCancelled(@NonNull  DatabaseError error) {
@@ -184,6 +185,9 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
     }
     private void initView() {
         progressBar = findViewById(R.id.progressBar);
+        switch_ac = findViewById(R.id.switch_ac);
+        switch_window = findViewById(R.id.switch_window);
+        switch_curtain = findViewById(R.id.switch_curtain);
 
         button_setting = findViewById(R.id.button_setting);
 
@@ -195,24 +199,18 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
         textViewPercent = (TextView)findViewById(R.id.textViewPercent);
         textViewLocation = findViewById(R.id.textViewLocation);
 
-        toggleAC = findViewById(R.id.toggleAC);
-        toggleCurtain = findViewById(R.id.toggleCurtain);
-        toggleWindow = findViewById(R.id.toggleWindow);
-
-        toggleCurtain.setOnClickListener(this);
-        toggleAC.setOnClickListener(this);
-        toggleWindow.setOnClickListener(this);
-
-        toggleButtonList = new ToggleButton[]{toggleAC, toggleCurtain, toggleWindow};
+        switch_ac.setOnClickListener(this);
+        switch_curtain.setOnClickListener(this);
+        switch_window.setOnClickListener(this);
 
         button_setting.setOnClickListener(this);
     }
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.toggleAC) {
-            Log.d(TAG, "toggleAc버튼 클릭됨");
-            boolean isChecked = toggleAC.isChecked();
+        if (id == R.id.switch_ac) {
+            Log.d(TAG, "switch_ac버튼 클릭됨");
+            boolean isChecked = switch_ac.isChecked();
             MyFirebase.acRef.setValue(isChecked);
             Log.d(TAG, String.valueOf(isChecked));
 
@@ -223,8 +221,8 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
             Log.i(TAG, "ac: " + ac_status);
             HttpRequestTask requestTask = new HttpRequestTask(MyServer.buttonAddress);
             requestTask.execute(ac_status);
-        } else if (id == R.id.toggleCurtain) {
-            boolean isChecked = toggleCurtain.isChecked();
+        } else if (id == R.id.switch_curtain) {
+            boolean isChecked = switch_curtain.isChecked();
             MyFirebase.curtRef.setValue(isChecked);
             Log.d(TAG,"ㅋㅋㅋ");
 
@@ -234,8 +232,8 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
 
             HttpRequestTask requestTask = new HttpRequestTask(MyServer.curtainAddress);
             requestTask.execute(curtain_status);
-        } else if (id == R.id.toggleWindow) {
-            boolean isChecked = toggleWindow.isChecked();
+        } else if (id == R.id.switch_window) {
+            boolean isChecked = switch_window.isChecked();
             MyFirebase.winRef.setValue(isChecked);
 
             String window_status;
@@ -258,7 +256,7 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     Log.d("firebase ac ", String.valueOf(task.getResult().getValue())); //값은 잘 불러와지는데
                     boolean acVal = (boolean) task.getResult().getValue();
-                    toggleAC.setChecked(true); //이게안돼
+                    switch_ac.setChecked(acVal);
                 }
             }
         });
@@ -270,7 +268,8 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     Log.d("firebase win", String.valueOf(task.getResult().getValue()));
                     boolean winVal = (boolean) task.getResult().getValue();
-                    toggleWindow.setChecked(winVal);
+                    switch_window.setChecked(winVal);
+
                 }
             }
         });
@@ -282,7 +281,7 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     Log.d("firebase curt", String.valueOf(task.getResult().getValue()));
                     boolean acVal = (boolean) task.getResult().getValue();
-                    toggleCurtain.setChecked(acVal);
+                    switch_curtain.setChecked(acVal);
                 }
             }
         });
@@ -493,7 +492,7 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
 
                 break;
         }
-        restore();
+//        restore();
     }
 
     public boolean checkLocationServicesStatus() {
@@ -546,6 +545,11 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(0, notificationBuilder.build());
+    }
+
+    @Override
+    public void onButtonApply() {
+        restore();
     }
 
 
