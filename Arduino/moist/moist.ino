@@ -16,13 +16,21 @@
 // Set these to run example.
 #define FIREBASE_HOST "iot-laundry02-default-rtdb.firebaseio.com"
 #define FIREBASE_AUTH "qlNCOwAypMDI1bjWPus5Szvs32lTDu1EDkRqEqiy"
+//
+////핫스팟
+//#define WIFI_SSID "winterz"
+//#define WIFI_PASSWORD "201105166"
+//IPAddress ip(192, 168, 246, 90); // 사용할 IP 주소
+//IPAddress gateway(192, 168, 246, 198); // 게이트웨이 주소
+//IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
 
 //핫스팟
-#define WIFI_SSID "winterz"
-#define WIFI_PASSWORD "201105166"
-IPAddress ip(192, 168, 246, 90); // 사용할 IP 주소
-IPAddress gateway(192, 168, 246, 198); // 게이트웨이 주소
-IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
+#define WIFI_SSID "iPhone"
+#define WIFI_PASSWORD "63113515"
+IPAddress ip(172, 20, 10, 90); // 사용할 IP 주소
+IPAddress gateway(172, 20, 10, 1); // 게이트웨이 주소
+IPAddress subnet(255, 255, 255, 240); // 서브넷 주소
+
 
 //수민 와파
 //#define WIFI_SSID            "KT_GiGA_2G_sumin" // AP server name
