@@ -6,7 +6,6 @@
 #include <FirebaseHttpClient.h>
 #include <FirebaseObject.h>
 
-
 // FirebaseDemo_ESP8266 is a sample that demo the different functions
 // of the FirebaseArduino API.
 
@@ -18,31 +17,22 @@
 #define FIREBASE_AUTH "qlNCOwAypMDI1bjWPus5Szvs32lTDu1EDkRqEqiy"
 //
 ////핫스팟
-//#define WIFI_SSID "winterz"
-//#define WIFI_PASSWORD "201105166"
-//IPAddress ip(192, 168, 246, 90); // 사용할 IP 주소
-//IPAddress gateway(192, 168, 246, 198); // 게이트웨이 주소
-//IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
+#define WIFI_SSID "winterz"
+#define WIFI_PASSWORD "201105166"
+IPAddress ip(192, 168, 120, 90); // 사용할 IP 주소
+IPAddress gateway(192, 168, 120, 34); // 게이트웨이 주소
+IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
 
 //핫스팟
-#define WIFI_SSID "iPhone"
-#define WIFI_PASSWORD "63113515"
-IPAddress ip(172, 20, 10, 90); // 사용할 IP 주소
-IPAddress gateway(172, 20, 10, 1); // 게이트웨이 주소
-IPAddress subnet(255, 255, 255, 240); // 서브넷 주소
-
-
-//수민 와파
-//#define WIFI_SSID            "KT_GiGA_2G_sumin" // AP server name
-//#define WIFI_PASSWORD        "sumin78900"         // AP server password
-//IPAddress ip(172, 30, 1, 90); // 사용할 IP 주소
-//IPAddress gateway(172, 30, 1, 254); // 게이트웨이 주소
-//IPAddress subnet(255, 255, 255, 0); // 서브넷 주소
+//#define WIFI_SSID "iPhone"
+//#define WIFI_PASSWORD "63113515"
+//IPAddress ip(172, 20, 10, 90); // 사용할 IP 주소
+//IPAddress gateway(172, 20, 10, 1); // 게이트웨이 주소
+//IPAddress subnet(255, 255, 255, 240); // 서브넷 주소
 
 int MOISTPIN = A0;
 
 WiFiServer server(80); //추가
-
 
 void setup() {
   Serial.begin(9600);
@@ -72,6 +62,7 @@ void setup() {
 
 void loop() {
   Serial.println(WiFi.localIP());
+  Serial.println(analogRead(MOISTPIN));
 
   /** 클라이언트(앱) 처리. 연결 안됐으면 return; **/
   Serial.println("요청 기다리는 중");

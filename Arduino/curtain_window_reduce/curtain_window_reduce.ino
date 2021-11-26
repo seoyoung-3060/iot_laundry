@@ -18,6 +18,8 @@
 
 #define WINDOW 0
 #define CURTAIN 1
+#define ANTICLOCK 0
+#define CLOCK 1
 //
 //#define WIFI_SSID "KT_GiGA_2G_sumin"
 //#define WIFI_PASSWORD "sumin78900"
@@ -102,24 +104,28 @@ void setup() {
 
 void open(int flag) {
   int count = 0;
+  int direction;
   Serial.println("open()호출");
   int countsperrev;
   if (flag == WINDOW) {
     window_state = true;
     countsperrev = COUNT_WINDOW;
 //    Firebase.setBool("/window", true); //써지질 않음 
+    direction = ANTICLOCK;
     
   } else if (flag == CURTAIN) {
     curtain_state = true;
     countsperrev = COUNT_CURTAIN;
-    Firebase.setBool("/curtain", curtain_state);
+//    Firebase.setBool("/curtain", curtain_state);
+    direction = CLOCK;
   }
 
   while (count < countsperrev) {                 // count가 countsperrev 보다 작으면
     yield(); //Soft WDT reset 에러 없애기 위해 추가
     Serial.print("countsperrev, count: ");
     Serial.println((String) countsperrev + ", " + count);
-    anticlockwise(flag);
+//    anticlockwise(flag);
+    rotate(flag, direction);
     count++;// anticlockwise()함수를 실행합니다.
   }
 }
@@ -127,23 +133,25 @@ void open(int flag) {
 void close(int flag) {
   int count = 0;
   Serial.println("close()호출");
-  int countsperrev;
+  int countsperrev, direction;
   if (flag == WINDOW) {
     window_state = false;
-    countsperrev = COUNT_WINDOW;//왜안되노... 
-
-    Firebase.setBool("/window", false);
+    countsperrev = COUNT_WINDOW;
+//    Firebase.setBool("/window", false); //왜안되노...
+    direction = CLOCK;
   } else if (flag == CURTAIN) {
     curtain_state = false;
     countsperrev = COUNT_CURTAIN;
 //    Firebase.setBool("/curtain", false);
+    direction = ANTICLOCK;
   }
 
   while (count < countsperrev) {                 // count가 countsperrev 보다 작으면
     yield(); //Soft WDT reset 에러 없애기 위해 추가
     Serial.print("countsperrev, count: ");
     Serial.println((String) countsperrev + ", " + count);
-    clockwise(flag);
+//    clockwise(flag);
+    rotate(flag, direction);
     count++;// clockwise()함수를 실행합니다.
   }
 }
@@ -191,18 +199,32 @@ void loop() {
   }
 }
 
-void anticlockwise(int flag) {
-  for (int i = 0; i < 8; i++) {                                    // 8번 반복합니다.
-    setOutput(i, flag);                                                     //  setOutput() 함수에 i 값을 넣습니다 (0~7)
-    delayMicroseconds(motorSpeed);                      // 모터 스피드만큼 지연합니다.
+void rotate(int flag, int direction) {
+  if (direction == CLOCK) {
+      for (int i = 0; i < 8; i++) {                                    // 8번 반복합니다.
+        setOutput(i, flag);                                                     //  setOutput() 함수에 i 값을 넣습니다 (0~7)
+        delayMicroseconds(motorSpeed);                      // 모터 스피드만큼 지연합니다.
+      }
+  } else if (direction == ANTICLOCK) {
+      for (int i = 7; i >= 0; i--) {                                    // 8번 반복합니다.
+        setOutput(i, flag);                                                    // setOutput() 함수에 i 값을 넣습니다 (7~0)
+        delayMicroseconds(motorSpeed);                      // 모터 스피트만큼 지연합니다.
+      }
   }
 }
-void clockwise(int flag) {
-  for (int i = 7; i >= 0; i--) {                                    // 8번 반복합니다.
-    setOutput(i, flag);                                                    // setOutput() 함수에 i 값을 넣습니다 (7~0)
-    delayMicroseconds(motorSpeed);                      // 모터 스피트만큼 지연합니다.
-  }
-}
+
+//void anticlockwise(int flag) {
+//  for (int i = 0; i < 8; i++) {                                    // 8번 반복합니다.
+//    setOutput(i, flag);                                                     //  setOutput() 함수에 i 값을 넣습니다 (0~7)
+//    delayMicroseconds(motorSpeed);                      // 모터 스피드만큼 지연합니다.
+//  }
+//}
+//void clockwise(int flag) {
+//  for (int i = 7; i >= 0; i--) {                                    // 8번 반복합니다.
+//    setOutput(i, flag);                                                    // setOutput() 함수에 i 값을 넣습니다 (7~0)
+//    delayMicroseconds(motorSpeed);                      // 모터 스피트만큼 지연합니다.
+//  }
+//}
 
 void setOutput(int out, int flag) {
   if (flag == WINDOW) {

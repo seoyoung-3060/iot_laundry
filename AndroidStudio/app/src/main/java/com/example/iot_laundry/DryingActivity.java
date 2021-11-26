@@ -70,11 +70,11 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
     private GPSTracker gpsTracker;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
-    String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
     //excel x,y
-    private String x="", y="", address = "";
-    private String date = "", time = "", total_date="";
+    private String x = "", y = "", address = "";
+    private String date = "", time = "", total_date = "";
 
     private String TAG = "DryingActivityLog";
 
@@ -90,7 +90,7 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drying);
 
-        showCurrentTime();
+//        showCurrentTime();
 
         initView();
         //토글버턴 상태설정이안됨..
@@ -107,11 +107,11 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
 
         MyFirebase.startMoistRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull  DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 startMoist = (Long) dataSnapshot.getValue();
 //                startMoist = (int) startMoistLong;
                 if (startMoist > 4) {
-                    progressBar.setMax((int)startMoist);
+                    progressBar.setMax((int) startMoist);
                 }
 
                 boolean bool;
@@ -123,20 +123,22 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
                 switch_curtain.setChecked(false);
                 switch_window.setChecked(false);
             }
+
             @Override
-            public void onCancelled(@NonNull  DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError error) {
             }
         });
         MyFirebase.moistRef.addValueEventListener(new ValueEventListener() {
             long moist_old = 0, moist_new;
+
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Log.d(TAG, "moistRef onDataChange");
                 moist_new = (Long) dataSnapshot.getValue();
 
-                Log.d(TAG, "moist_new: "+moist_new);
-                Log.d(TAG, "moist_old: "+moist_old);
-                Log.d(TAG, "startMoist: "+startMoist);
+                Log.d(TAG, "moist_new: " + moist_new);
+                Log.d(TAG, "moist_old: " + moist_old);
+                Log.d(TAG, "startMoist: " + startMoist);
 
 
 //                if (startMoist != 0 && (startMoist > moist_new) && (moist_old > moist_new)) { 갑자기 값이 뛰는 경우가 있으므로 세번째껀 추가하지 말아야겠음
@@ -144,8 +146,8 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
                     progressBar.setProgress((int) (startMoist - moist_new));
                     Log.d(TAG, String.valueOf(startMoist - moist_new));
                     double percent = Math.round(((double) (startMoist - moist_new) / (double) startMoist) * 100);
-                    Log.d(TAG, "percent: "+percent);
-                    Log.d(TAG, "percent2: "+(startMoist - moist_new) / startMoist);
+                    Log.d(TAG, "percent: " + percent);
+                    Log.d(TAG, "percent2: " + (startMoist - moist_new) / startMoist);
                     textViewPercent.setText(String.valueOf(percent));
                 }
                 moist_old = moist_new;
@@ -171,6 +173,7 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
 
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -179,10 +182,11 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
 
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
-        }else {
+        } else {
             checkRunTimePermission();
         }
     }
+
     private void initView() {
         progressBar = findViewById(R.id.progressBar);
         switch_ac = findViewById(R.id.switch_ac);
@@ -191,12 +195,12 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
 
         button_setting = findViewById(R.id.button_setting);
 
-        dateTextView = (TextView)findViewById(R.id.textViewTime);
-        weatherTextView = (TextView)findViewById(R.id.weather);
-        rainTextView = (TextView)findViewById(R.id.rain);
-        humidityTextView = (TextView)findViewById(R.id.humidity);
-        adviceTextView = (TextView)findViewById(R.id.textViewAdvice);
-        textViewPercent = (TextView)findViewById(R.id.textViewPercent);
+        dateTextView = (TextView) findViewById(R.id.textViewTime);
+        weatherTextView = (TextView) findViewById(R.id.weather);
+        rainTextView = (TextView) findViewById(R.id.rain);
+        humidityTextView = (TextView) findViewById(R.id.humidity);
+        adviceTextView = (TextView) findViewById(R.id.textViewAdvice);
+        textViewPercent = (TextView) findViewById(R.id.textViewPercent);
         textViewLocation = findViewById(R.id.textViewLocation);
 
         switch_ac.setOnClickListener(this);
@@ -205,6 +209,7 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
 
         button_setting.setOnClickListener(this);
     }
+
     @Override
     public void onClick(View v) {
         int id = v.getId();
@@ -215,8 +220,8 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
             Log.d(TAG, String.valueOf(isChecked));
 
             String ac_status;
-            if (isChecked)    ac_status = "acOn";
-            else              ac_status = "acOff";
+            if (isChecked) ac_status = "acOn";
+            else ac_status = "acOff";
 
             Log.i(TAG, "ac: " + ac_status);
             HttpRequestTask requestTask = new HttpRequestTask(MyServer.buttonAddress);
@@ -224,11 +229,11 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
         } else if (id == R.id.switch_curtain) {
             boolean isChecked = switch_curtain.isChecked();
             MyFirebase.curtRef.setValue(isChecked);
-            Log.d(TAG,"ㅋㅋㅋ");
+            Log.d(TAG, "ㅋㅋㅋ");
 
             String curtain_status;
-            if (isChecked)                curtain_status = "curtOn";
-            else                          curtain_status = "curtOff";
+            if (isChecked) curtain_status = "curtOn";
+            else curtain_status = "curtOff";
 
             HttpRequestTask requestTask = new HttpRequestTask(MyServer.curtainAddress);
             requestTask.execute(curtain_status);
@@ -237,8 +242,8 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
             MyFirebase.winRef.setValue(isChecked);
 
             String window_status;
-            if (isChecked)                window_status = "winOn";
-            else                          window_status = "winOff";
+            if (isChecked) window_status = "winOn";
+            else window_status = "winOff";
 
             HttpRequestTask requestTask = new HttpRequestTask(MyServer.windowAddress);
             requestTask.execute(window_status);
@@ -247,7 +252,8 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
             bottomSheet.show(getSupportFragmentManager(), "addDiary");
         }
     }
-    private void restore() { //안되는중 ㅡㅡ..
+
+    private void restore() {
         MyFirebase.acRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -299,19 +305,19 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
         double longitude = gpsTracker.getLongitude();
 
         address = getCurrentAddress(latitude, longitude);
-        Log.i("address",address);
+        Log.i("address", address);
 
         String[] local = address.split(" "); //local[0]==대한민국 local[1]==부산광역시 local[2]==금정구 local[3]==장전동
         String localName = local[2];//'구'이름 불러옴
         String addressStr = "";
-        for (int i=1; i < local.length; i++) {
+        for (int i = 1; i < local.length; i++) {
             addressStr += local[i] + " ";
         }
 
         readExcel(localName); //행정시 이름으로 격자값 구하기
         Toast.makeText(DryingActivity.this, localName, Toast.LENGTH_LONG).show();
 
-        Log.i("localname",localName);
+        Log.i("localname", localName);
 
         String weather = "";
         WeatherData weatherData = new WeatherData();
@@ -321,9 +327,9 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
         } catch (JSONException e) {
             Log.i("WEATHER_JSONERROR", e.getMessage());
         } catch (IOException e) {
-            Log.i("WEATHER_IOERROR",e.getMessage());
+            Log.i("WEATHER_IOERROR", e.getMessage());
         }
-        Log.i("현재날씨",weather);
+        Log.i("현재날씨", weather);
 
         textViewLocation.setText(addressStr);
     }
@@ -335,7 +341,7 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
 
             if (workbook != null) {
                 Sheet sheet = workbook.getSheet(0); // 시트 불러오기
-                if(sheet != null) {
+                if (sheet != null) {
                     int colTotal = sheet.getColumns(); //전체 칼럼
                     int rowIndexStart = 1;             //row 인덱스 시작
                     int rowTotal = sheet.getColumn(colTotal - 1).length;
@@ -393,7 +399,7 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    void checkRunTimePermission(){
+    void checkRunTimePermission() {
         //런타임 퍼미션 처리
         // 1. 위치 퍼미션을 가지고 있는지 체크합니다.
         int hasFineLocationPermission = ContextCompat.checkSelfPermission(DryingActivity.this,
@@ -425,7 +431,7 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    public String getCurrentAddress( double latitude, double longitude) {
+    public String getCurrentAddress(double latitude, double longitude) {
         //지오코더... GPS를 주소로 변환
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
 
@@ -501,9 +507,11 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
+
     String channelId = "one-channel";
     String channelName = "My Channel One1";
     String channelDescription = "My Channel One Description";
+
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -516,6 +524,7 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
             notificationManager.createNotificationChannel(channel);
         }
     }
+
     private void sendNotification() {
         Intent intent = new Intent(this, DryingCompleteActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -557,17 +566,20 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
         private String serverAddress;// = MyServer.serverAddress;
         private String TAG = "HttpRequestTask";
 
-        public  HttpRequestTask(String serverAdress) {
+        public HttpRequestTask(String serverAdress) {
             this.serverAddress = serverAdress;
         }
-        public  HttpRequestTask( ) { }
+
+        public HttpRequestTask() {
+        }
+
         @Override
         protected String doInBackground(String... params) {
             Log.d(TAG, "doInBackground호출");
             Log.d(TAG, "serverAdress: " + serverAddress);
 
             String val = params[0];
-            final String url = "http://"+ serverAddress + "/" + val;
+            final String url = "http://" + serverAddress + "/" + val;
             Log.d(TAG, "url: " + url);
 
             //okHttp 라이브러리를 사용한다.
@@ -615,52 +627,55 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
 //                }
 //            });
     }
-
-    private void showCurrentTime() {
-        dateTextView = (TextView)findViewById(R.id.textViewTime);
-        SimpleDateFormat mFormat = new SimpleDateFormat("M월 d일 H시 mm분"); //dateFormat바꿈
-//        timeText =  findViewById(R.id.textView_time);
-        new Thread(new Runnable() { //실시간으로 시계출력하기 위한 thread
-            @Override
-            public void run() {
-
-                while (true) {
-                    try {
-                        runOnUiThread(new Runnable() {
-
-                            @Override
-                            public void run() {
-
-                                now = System.currentTimeMillis(); //현재 시간 가져오기
-                                Date = new Date(now);             //Date 생성하기
-
-                                String total_date = mFormat.format(Date);
-                                dateTextView.setText(total_date);
-
-
-                            }
-                        });
-
-//                        Calendar calendar = Calendar.getInstance();
-//                        dateTextView.setText("오전 " + calendar.get(Calendar.HOUR_OF_DAY) + "시 " + calendar.get(Calendar.MINUTE) + "분 " + calendar.get(Calendar.SECOND) + "초");
-
-//                        now = System.currentTimeMillis(); //현재 시간 가져오기
-//                        Date = new Date(now);             //Date 생성하기
-//
-//                        String total_date = mFormat.format(Date);
-//                        dateTextView.setText(total_date);
-//
-                        Thread.sleep(60000); //1분
-                    } catch (InterruptedException ex) {}
-                }
-            }
-        }).start(); // 실시간으로 시계 출력
-    }
-
 }
 
 
 /** END OF CODE **/
+
+//    private void showCurrentTime() {
+//        dateTextView = (TextView)findViewById(R.id.textViewTime);
+//        SimpleDateFormat mFormat = new SimpleDateFormat("M월 d일 H시 mm분"); //dateFormat바꿈
+////        timeText =  findViewById(R.id.textView_time);
+//        new Thread(new Runnable() { //실시간으로 시계출력하기 위한 thread
+//            @Override
+//            public void run() {
+//
+//                while (true) {
+//                    try {
+//                        runOnUiThread(new Runnable() {
+//
+//                            @Override
+//                            public void run() {
+//
+//                                now = System.currentTimeMillis(); //현재 시간 가져오기
+//                                Date = new Date(now);             //Date 생성하기
+//
+//                                String total_date = mFormat.format(Date);
+//                                dateTextView.setText(total_date);
+//
+//
+//                            }
+//                        });
+//
+////                        Calendar calendar = Calendar.getInstance();
+////                        dateTextView.setText("오전 " + calendar.get(Calendar.HOUR_OF_DAY) + "시 " + calendar.get(Calendar.MINUTE) + "분 " + calendar.get(Calendar.SECOND) + "초");
+//
+////                        now = System.currentTimeMillis(); //현재 시간 가져오기
+////                        Date = new Date(now);             //Date 생성하기
+////
+////                        String total_date = mFormat.format(Date);
+////                        dateTextView.setText(total_date);
+////
+//                        Thread.sleep(60000); //1분
+//                    } catch (InterruptedException ex) {}
+//                }
+//            }
+//        }).start(); // 실시간으로 시계 출력
+//    }
+//
+//}
+
+
 //switch (v.getId()){
 //        case R.id.reset_button:
 

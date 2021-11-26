@@ -2,6 +2,8 @@ package com.example.iot_laundry;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 
@@ -36,6 +38,7 @@ import java.net.UnknownHostException;
 public class MainActivity extends AppCompatActivity {
     private String TAG = "MainActivityLog";
     MaterialButton buttonStart;
+    AppCompatImageButton button_setting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         buttonStart = findViewById(R.id.buttonStart);
+        button_setting = findViewById(R.id.button_setting);
 
 //        this.registerReceiver(wifiEventReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
@@ -58,6 +62,13 @@ public class MainActivity extends AppCompatActivity {
 //                DryingActivity.HttpRequestTask httpRequestTask = new DryingActivity.HttpRequestTask();
                 DryingActivity.HttpRequestTask requestTask = new DryingActivity.HttpRequestTask(MyServer.moistAddress);
                 requestTask.execute(activityState);
+            }
+        });
+        button_setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ServerSettingDialog bottomSheet = new ServerSettingDialog();
+                bottomSheet.show(getSupportFragmentManager(), "addDiary");
             }
         });
 

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +19,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.iot_laundry.firebase.MyFirebase;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.firebase.database.DataSnapshot;
 
 import java.util.List;
 
@@ -82,13 +86,51 @@ public class SettingDialog extends BottomSheetDialogFragment implements View.OnC
             @Override
             public void onShow(DialogInterface dialog) {
                 BottomSheetDialog d = (BottomSheetDialog) dialog;
-                FrameLayout bottomSheet = (FrameLayout) d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-                DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
-//                int height = displayMetrics.heightPixels;
-//                int maxHeight = (int) (height*0.93);
-//                BottomSheetBehavior.from(bottomSheet).setPeekHeight(maxHeight);
             }
         });
+
+        MyFirebase.acRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                } else {
+                    Log.d("firebase ac ", String.valueOf(task.getResult().getValue())); //값은 잘 불러와지는데
+                    boolean acVal = (boolean) task.getResult().getValue();
+                    if (acVal == true) radioGroup_ac.check(R.id.radioButton_ac_on);
+                    else radioGroup_ac.check(R.id.radioButton_ac_off);
+                }
+            }
+        });
+        MyFirebase.winRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                } else {
+                    Log.d("firebase win", String.valueOf(task.getResult().getValue()));
+                    boolean winVal = (boolean) task.getResult().getValue();
+                    if (winVal == true) radioGroup_window.check(R.id.radioButton_window_on);
+                    else radioGroup_window.check(R.id.radioButton_window_off);
+
+                }
+            }
+        });
+        MyFirebase.curtRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                } else {
+                    Log.d("firebase curt", String.valueOf(task.getResult().getValue()));
+                    boolean curVal = (boolean) task.getResult().getValue();
+                    if (curVal == true) radioGroup_curtain.check(R.id.radioButton_curtain_on);
+                    else radioGroup_curtain.check(R.id.radioButton_curtain_off);
+                }
+            }
+        });
+
+
         return dialog;
     }
 
