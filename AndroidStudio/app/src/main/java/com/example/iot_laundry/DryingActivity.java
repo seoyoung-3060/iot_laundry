@@ -85,6 +85,8 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
 
     static long startMoist = 0;
 
+    MyServer myServer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -163,11 +165,11 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
                     progressBar.setProgress((int) startMoist);
 
                     //건조 완료 시 http
-                    HttpRequestTask requestTask2 = new HttpRequestTask(MyServer.curtainAddress);
+                    HttpRequestTask requestTask2 = new HttpRequestTask(myServer.getCurtainAddress());
                     requestTask2.execute("curtOn");
-                    HttpRequestTask requestTask3 = new HttpRequestTask(MyServer.windowAddress);
+                    HttpRequestTask requestTask3 = new HttpRequestTask(myServer.getWindowAddress());
                     requestTask3.execute("winOn");
-                    HttpRequestTask requestTask1 = new HttpRequestTask(MyServer.buttonAddress);
+                    HttpRequestTask requestTask1 = new HttpRequestTask(myServer.getButtonAddress());
                     requestTask1.execute("acOn");
 
 
@@ -208,6 +210,8 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
         switch_window.setOnClickListener(this);
 
         button_setting.setOnClickListener(this);
+
+        myServer = new MyServer(getApplicationContext());
     }
 
     @Override
@@ -224,7 +228,7 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
             else ac_status = "acOff";
 
             Log.i(TAG, "ac: " + ac_status);
-            HttpRequestTask requestTask = new HttpRequestTask(MyServer.buttonAddress);
+            HttpRequestTask requestTask = new HttpRequestTask(myServer.getButtonAddress());
             requestTask.execute(ac_status);
         } else if (id == R.id.switch_curtain) {
             boolean isChecked = switch_curtain.isChecked();
@@ -235,7 +239,7 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
             if (isChecked) curtain_status = "curtOn";
             else curtain_status = "curtOff";
 
-            HttpRequestTask requestTask = new HttpRequestTask(MyServer.curtainAddress);
+            HttpRequestTask requestTask = new HttpRequestTask(myServer.getCurtainAddress());
             requestTask.execute(curtain_status);
         } else if (id == R.id.switch_window) {
             boolean isChecked = switch_window.isChecked();
@@ -245,7 +249,7 @@ public class DryingActivity extends AppCompatActivity implements View.OnClickLis
             if (isChecked) window_status = "winOn";
             else window_status = "winOff";
 
-            HttpRequestTask requestTask = new HttpRequestTask(MyServer.windowAddress);
+            HttpRequestTask requestTask = new HttpRequestTask(myServer.getWindowAddress());
             requestTask.execute(window_status);
         } else if (id == R.id.button_setting) {
             SettingDialog bottomSheet = new SettingDialog();

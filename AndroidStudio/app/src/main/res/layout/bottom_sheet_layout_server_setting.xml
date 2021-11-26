@@ -52,8 +52,17 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_toRightOf="@id/image_air"
                 android:layout_marginLeft="10dp"
-                android:text="서버 ip 주소를 설정해주세요"
+                android:text="앱 처음 실행 시 서버 ip 주소를 설정해주세요"
                 />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:layout_toRightOf="@id/image_air"
+                android:layout_marginLeft="10dp"
+                />
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -62,41 +71,24 @@
                 android:layout_marginLeft="10dp"
                 android:orientation="horizontal">
                 <EditText
-                    android:id="@+id/et1"
-                    android:layout_width="50dp"
+                    android:id="@+id/et"
+                    android:layout_width="wrap_content"
+                    android:hint="192.168.33"
+                    android:layout_marginRight="3dp"
                     android:layout_height="wrap_content"/>
-                <TextView
-                    android:layout_marginTop="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="."/>
-                <EditText
-                    android:id="@+id/et2"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"/>
-                <TextView
-                    android:layout_marginTop="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="."/>
-
-                <EditText
-                    android:id="@+id/et3"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content" />
 
                 <TextView
-                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="."/>
 
                 <TextView
-                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="10dp"
                     android:textSize="18dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="고정값"/>
+                    android:text="90"/>
             </LinearLayout>
 
 

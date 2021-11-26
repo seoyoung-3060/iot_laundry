@@ -28,7 +28,7 @@ import com.google.firebase.database.DataSnapshot;
 public class ServerSettingDialog extends BottomSheetDialogFragment implements View.OnClickListener {
     private static String TAG = ServerSettingDialog.class.getSimpleName();
 
-    EditText et1, et2, et3;
+    EditText et;
     Button btn_save;
 
 
@@ -39,9 +39,7 @@ public class ServerSettingDialog extends BottomSheetDialogFragment implements Vi
         View view = inflater.inflate(R.layout.bottom_sheet_layout_server_setting, container, false);
 
         /* binding views and initializing */
-        et1 = view.findViewById(R.id.et1);
-        et2 = view.findViewById(R.id.et2);
-        et3 = view.findViewById(R.id.et3);
+        et = view.findViewById(R.id.et);
         btn_save = view.findViewById(R.id.btn_save);
 
         btn_save.setOnClickListener(this);
@@ -68,12 +66,9 @@ public class ServerSettingDialog extends BottomSheetDialogFragment implements Vi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_save:
-                String server1 = String.valueOf(et1.getText());
-                String server2 = String.valueOf(et2.getText());
-                String server3 = String.valueOf(et3.getText());
-
-                String serverAddress = server1 + "." + server2 + "." + server3 + ".";
-                MyServer.setServerAddress(serverAddress);
+                String serverAddress = String.valueOf(et.getText());
+                MyServer myServer = new MyServer(getContext());
+                myServer.setServerAddress(serverAddress);
 
                 dismiss();
                 break;

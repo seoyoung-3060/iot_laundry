@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         buttonStart = findViewById(R.id.buttonStart);
         button_setting = findViewById(R.id.button_setting);
 
+        MyServer myServer = new MyServer(getApplicationContext());
+
 //        this.registerReceiver(wifiEventReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         buttonStart.setOnClickListener(new View.OnClickListener() {
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 String activityState = "start";
 //                DryingActivity.HttpRequestTask httpRequestTask = new DryingActivity.HttpRequestTask();
-                DryingActivity.HttpRequestTask requestTask = new DryingActivity.HttpRequestTask(MyServer.moistAddress);
+                DryingActivity.HttpRequestTask requestTask = new DryingActivity.HttpRequestTask(myServer.getMoistAddress());
                 requestTask.execute(activityState);
             }
         });
